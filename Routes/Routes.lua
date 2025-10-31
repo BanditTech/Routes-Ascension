@@ -57,11 +57,9 @@ Contact:
 	Email: Grum ( routes AT grum DOT nl )
 	       Xinhuan ( xinhuan AT gmail DOT com )
 	       Paypal donations are welcome ;)
-]]
-
-Routes = LibStub("AceAddon-3.0"):NewAddon("Routes", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
+]] Routes = LibStub("AceAddon-3.0"):NewAddon("Routes", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 local Routes = Routes
-local L   = LibStub("AceLocale-3.0"):GetLocale("Routes", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("Routes", false)
 local G = {} -- was Graph-1.0, but we removed the dependency
 Routes.G = G
 
@@ -72,67 +70,67 @@ local defaults = {
 		routes = {
 			['*'] = { -- zone name, stored as the MapFile string constant
 				['*'] = { -- route name
-					route           = {},    -- point, point, point
-					color           = nil,   -- defaults to db.defaults.color if nil
-					width           = nil,   -- defaults to db.defaults.width if nil
-					width_minimap   = nil,   -- defaults to db.defaults.width_minimap if nil
-					width_battlemap = nil,   -- defaults to db.defaults.width_battlemap if nil
-					hidden          = false, -- boolean
-					looped          = 1,     -- looped? 1 is used (instead of true) because initial early code used 1 inside route creation code
-					visible         = true,  -- visible?
-					length          = 0,     -- length
-					selection       = {
-						['**'] = false  -- Node we're interested in tracking
+					route = {}, -- point, point, point
+					color = nil, -- defaults to db.defaults.color if nil
+					width = nil, -- defaults to db.defaults.width if nil
+					width_minimap = nil, -- defaults to db.defaults.width_minimap if nil
+					width_battlemap = nil, -- defaults to db.defaults.width_battlemap if nil
+					hidden = false, -- boolean
+					looped = 1, -- looped? 1 is used (instead of true) because initial early code used 1 inside route creation code
+					visible = true, -- visible?
+					length = 0, -- length
+					selection = {
+						['**'] = false -- Node we're interested in tracking
 					},
-					db_type         = {
-						['**'] = false  -- db_types used for use with auto show/hide
+					db_type = {
+						['**'] = false -- db_types used for use with auto show/hide
 					},
-					taboos          = {
-						['**'] = false  -- taboo regions in effect
+					taboos = {
+						['**'] = false -- taboo regions in effect
 					},
-					taboolist       = {} -- point, point, point
-				},
-			},
+					taboolist = {} -- point, point, point
+				}
+			}
 		},
 		taboo = {
 			['*'] = { -- zone name, stored as the MapFile string constant
 				['*'] = { -- route name
-					route           = {},    -- point, point, point
-				},
-			},
+					route = {} -- point, point, point
+				}
+			}
 		},
-		defaults = {            --    r,    g,    b,   a
-			color           = {   1, 0.75, 0.75,   1 },
-			hidden_color    = {   1,    1,    1, 0.5 },
-			width           = 30,
-			width_minimap   = 25,
+		defaults = { --    r,    g,    b,   a
+			color = {1, 0.75, 0.75, 1},
+			hidden_color = {1, 1, 1, 0.5},
+			width = 30,
+			width_minimap = 25,
 			width_battlemap = 15,
-			show_hidden     = false,
+			show_hidden = false,
 			update_distance = 1,
-			fake_point      = -1,
-			fake_data       = 'dummy',
-			draw_minimap    = true,
-			draw_worldmap   = true,
-			draw_battlemap  = true,
-			draw_indoors    = false,
+			fake_point = -1,
+			fake_data = 'dummy',
+			draw_minimap = true,
+			draw_worldmap = true,
+			draw_battlemap = true,
+			draw_indoors = false,
 			tsp = {
-				initial_pheromone  = 0.1,   -- Initial pheromone trail value
-				alpha              = 1,     -- Likelihood of ants to follow pheromone trails (larger value == more likely)
-				beta               = 6,     -- Likelihood of ants to choose closer nodes (larger value == more likely)
-				local_decay        = 0.2,   -- Governs local trail decay rate [0, 1]
-				local_update       = 0.4,   -- Amount of pheromone to reinforce local trail update by
-				global_decay       = 0.2,   -- Governs global trail decay rate [0, 1]
-				twoopt_passes      = 3,     -- Number of times to perform 2-opt passes
-				two_point_five_opt = false, -- Perform optimized 2-opt pass
+				initial_pheromone = 0.1, -- Initial pheromone trail value
+				alpha = 1, -- Likelihood of ants to follow pheromone trails (larger value == more likely)
+				beta = 6, -- Likelihood of ants to choose closer nodes (larger value == more likely)
+				local_decay = 0.2, -- Governs local trail decay rate [0, 1]
+				local_update = 0.4, -- Amount of pheromone to reinforce local trail update by
+				global_decay = 0.2, -- Governs global trail decay rate [0, 1]
+				twoopt_passes = 3, -- Number of times to perform 2-opt passes
+				two_point_five_opt = false -- Perform optimized 2-opt pass
 			},
 			prof_options = {
-				Herbalism  = "Always",
-				Mining     = "Always",
-				Fishing    = "Always",
-				Treasure   = "Always",
+				Herbalism = "Always",
+				Mining = "Always",
+				Fishing = "Always",
+				Treasure = "Always",
 				ExtractGas = "Always",
-				Woodcutting= "Always",
-				Note       = "Always",
+				Woodcutting = "Always",
+				Note = "Always"
 			},
 			use_auto_showhide = false,
 			waypoint_hit_distance = 50,
@@ -142,7 +140,7 @@ local defaults = {
 			callbacks = {
 				['*'] = true
 			}
-		},
+		}
 	}
 }
 
@@ -175,19 +173,15 @@ code are inlined in critical code paths in various functions, changing
 the coord storage format requires changing the inlined code in numerous
 locations in addition to these 2 functions
 ]]
-function Routes:getID(x, y)
-	return floor(x * 10000 + 0.5) * 10000 + floor(y * 10000 + 0.5)
-end
-function Routes:getXY(id)
-	return floor(id / 10000) / 10000, (id % 10000) / 10000
-end
+function Routes:getID(x, y) return floor(x * 10000 + 0.5) * 10000 + floor(y * 10000 + 0.5) end
+function Routes:getXY(id) return floor(id / 10000) / 10000, (id % 10000) / 10000 end
 
 function Routes:DrawWorldmapLines()
 	-- setup locals
-	local zone = self.zoneNames[GetCurrentMapContinent()*100 + GetCurrentMapZone()]
-	local BattlefieldMinimap = BattlefieldMinimap  -- local reference if it exists
+	local zone = self.zoneNames[GetCurrentMapContinent() * 100 + GetCurrentMapZone()]
+	local BattlefieldMinimap = BattlefieldMinimap -- local reference if it exists
 	local fh, fw = WorldMapButton:GetHeight(), WorldMapButton:GetWidth()
-	local bfh, bfw  -- BattlefieldMinimap height and width
+	local bfh, bfw -- BattlefieldMinimap height and width
 	local defaults = db.defaults
 
 	-- clear all the lines
@@ -202,9 +196,9 @@ function Routes:DrawWorldmapLines()
 	if not zone then return end -- player is not viewing a zone map of a continent
 	local flag1 = defaults.draw_worldmap and WorldMapFrame:IsShown() -- Draw worldmap lines?
 	local flag2 = defaults.draw_battlemap and BattlefieldMinimap and BattlefieldMinimap:IsShown() -- Draw battlemap lines?
-	if (not flag1) and (not flag2) then	return end 	-- Nothing to draw
+	if (not flag1) and (not flag2) then return end -- Nothing to draw
 
-	for route_name, route_data in pairs( db.routes[ self.zoneData[zone][4] ] ) do
+	for route_name, route_data in pairs(db.routes[self.zoneData[zone][4]]) do
 		if type(route_data) == "table" and type(route_data.route) == "table" and #route_data.route > 1 then
 			local width = route_data.width or defaults.width
 			local halfwidth = route_data.width_battlemap or defaults.width_battlemap
@@ -215,24 +209,18 @@ function Routes:DrawWorldmapLines()
 				local last_point
 				local sx, sy
 				if route_data.looped then
-					last_point = route_data.route[ #route_data.route ]
+					last_point = route_data.route[#route_data.route]
 					sx, sy = floor(last_point / 10000) / 10000, (last_point % 10000) / 10000
 					sy = (1 - sy)
 				end
 				for i = 1, #route_data.route do
 					local point = route_data.route[i]
-					if point == defaults.fake_point then
-						point = nil
-					end
+					if point == defaults.fake_point then point = nil end
 					if last_point and point then
 						local ex, ey = floor(point / 10000) / 10000, (point % 10000) / 10000
 						ey = (1 - ey)
-						if (flag1) then
-							G:DrawLine(WorldMapButton, sx*fw, sy*fh, ex*fw, ey*fh, width, color , "OVERLAY")
-						end
-						if (flag2) then
-							G:DrawLine(BattlefieldMinimap, sx*bfw, sy*bfh, ex*bfw, ey*bfh, halfwidth, color , "OVERLAY")
-						end
+						if (flag1) then G:DrawLine(WorldMapButton, sx * fw, sy * fh, ex * fw, ey * fh, width, color, "OVERLAY") end
+						if (flag2) then G:DrawLine(BattlefieldMinimap, sx * bfw, sy * bfh, ex * bfw, ey * bfh, halfwidth, color, "OVERLAY") end
 						sx, sy = ex, ey
 					end
 					last_point = point
@@ -246,27 +234,27 @@ local MinimapShapes = {
 	-- quadrant booleans (same order as SetTexCoord)
 	-- {upper-left, lower-left, upper-right, lower-right}
 	-- true = rounded, false = squared
-	["ROUND"]                 = { true,  true,  true,  true},
-	["SQUARE"]                = {false, false, false, false},
-	["CORNER-TOPLEFT"]        = { true, false, false, false},
-	["CORNER-TOPRIGHT"]       = {false, false,  true, false},
-	["CORNER-BOTTOMLEFT"]     = {false,  true, false, false},
-	["CORNER-BOTTOMRIGHT"]    = {false, false, false,  true},
-	["SIDE-LEFT"]             = { true,  true, false, false},
-	["SIDE-RIGHT"]            = {false, false,  true,  true},
-	["SIDE-TOP"]              = { true, false,  true, false},
-	["SIDE-BOTTOM"]           = {false,  true, false,  true},
-	["TRICORNER-TOPLEFT"]     = { true,  true,  true, false},
-	["TRICORNER-TOPRIGHT"]    = { true, false,  true,  true},
-	["TRICORNER-BOTTOMLEFT"]  = { true,  true, false,  true},
-	["TRICORNER-BOTTOMRIGHT"] = {false,  true,  true,  true},
+	["ROUND"] = {true, true, true, true},
+	["SQUARE"] = {false, false, false, false},
+	["CORNER-TOPLEFT"] = {true, false, false, false},
+	["CORNER-TOPRIGHT"] = {false, false, true, false},
+	["CORNER-BOTTOMLEFT"] = {false, true, false, false},
+	["CORNER-BOTTOMRIGHT"] = {false, false, false, true},
+	["SIDE-LEFT"] = {true, true, false, false},
+	["SIDE-RIGHT"] = {false, false, true, true},
+	["SIDE-TOP"] = {true, false, true, false},
+	["SIDE-BOTTOM"] = {false, true, false, true},
+	["TRICORNER-TOPLEFT"] = {true, true, true, false},
+	["TRICORNER-TOPRIGHT"] = {true, false, true, true},
+	["TRICORNER-BOTTOMLEFT"] = {true, true, false, true},
+	["TRICORNER-BOTTOMRIGHT"] = {false, true, true, true}
 }
 
 local minimap_radius
 local minimap_rotate
 local indoors = "indoor"
 
-local function is_round( dx, dy )
+local function is_round(dx, dy)
 	local map_shape = GetMinimapShape and GetMinimapShape() or "ROUND"
 
 	local q = 1
@@ -277,14 +265,14 @@ local function is_round( dx, dy )
 	return MinimapShapes[map_shape][q]
 end
 
-local function is_inside( sx, sy, cx, cy, radius )
+local function is_inside(sx, sy, cx, cy, radius)
 	local dx = sx - cx
 	local dy = sy - cy
 
-	if is_round( dx, dy ) then
-		return dx*dx+dy*dy <= radius*radius
+	if is_round(dx, dy) then
+		return dx * dx + dy * dy <= radius * radius
 	else
-		return math_abs( dx ) <= radius and math_abs( dy ) <= radius
+		return math_abs(dx) <= radius and math_abs(dy) <= radius
 	end
 end
 
@@ -293,7 +281,7 @@ local function GetFacing()
 	return -MiniMapCompassRing:GetFacing()
 end
 
-local last_X, last_Y, last_facing = 1/0, 1/0, 1/0
+local last_X, last_Y, last_facing = 1 / 0, 1 / 0, 1 / 0
 
 -- implementation of cache - use zone in the key for an unique identifier
 -- because every zone has a different X/Y location and possible yardsizes
@@ -301,19 +289,50 @@ local X_cache = {}
 local Y_cache = {}
 local XY_cache_mt = {
 	__index = function(t, key)
-		local zone, coord = (';'):split( key )
+		local zone, coord = (';'):split(key)
 		local X = Routes.zoneData[zone][1] * floor(coord / 10000) / 10000
 		local Y = Routes.zoneData[zone][2] * (coord % 10000) / 10000
 		X_cache[key] = X
 		Y_cache[key] = Y
 
 		-- figure out which one to return
-		if t == X_cache then return X else return Y end
+		if t == X_cache then
+			return X
+		else
+			return Y
+		end
 	end
 }
 
-setmetatable( X_cache, XY_cache_mt )
-setmetatable( Y_cache, XY_cache_mt )
+setmetatable(X_cache, XY_cache_mt)
+setmetatable(Y_cache, XY_cache_mt)
+
+-- World-coordinate caches (in game world yards) keyed by "areaID;coord"
+local WX_cache = {}
+local WY_cache = {}
+local WXY_cache_mt = {
+	__index = function(t, key)
+		local areaID, coord = (';'):split(key)
+		areaID = areaID + 0
+		local x = floor(coord / 10000) / 10000
+		local y = (coord % 10000) / 10000
+		local X, Y = C_WorldMap.GetWorldPosition(areaID, x, y)
+		-- Fallback to 0 if API fails (should not normally happen)
+		X = X or 0
+		Y = Y or 0
+		WX_cache[key] = X
+		WY_cache[key] = Y
+
+		if t == WX_cache then
+			return X
+		else
+			return Y
+		end
+	end
+}
+
+setmetatable(WX_cache, WXY_cache_mt)
+setmetatable(WY_cache, WXY_cache_mt)
 
 function Routes:DrawMinimapLines(forceUpdate)
 	if not db.defaults.draw_minimap then
@@ -338,23 +357,26 @@ function Routes:DrawMinimapLines(forceUpdate)
 	end
 
 	local defaults = db.defaults
-	local zoneW, zoneH = self.zoneData[zone][1], self.zoneData[zone][2]
-	if not zoneW then return end
-	local cx, cy = zoneW * _x, zoneH * _y
-
-	local facing, sin, cos
-	if minimap_rotate then
-		facing = GetFacing()
+	-- Use world coordinates (in yards) to match Minimap:GetViewRadius() and Astrolabe behavior
+	local areaID = GetCurrentMapAreaID and GetCurrentMapAreaID() or self.zoneData[zone][3]
+	if not areaID then return end
+	local cx, cy = C_WorldMap.GetWorldPosition(areaID, _x, _y)
+	if not cx or not cy then
+		G:HideLines(Minimap)
+		return
 	end
 
-	if (not forceUpdate) and facing == last_facing and (last_X-cx)^2 + (last_Y-cy)^2 < defaults.update_distance^2 then
+	local facing, sin, cos
+	if minimap_rotate then facing = GetFacing() end
+
+	if (not forceUpdate) and facing == last_facing and (last_X - cx) ^ 2 + (last_Y - cy) ^ 2 < defaults.update_distance ^ 2 then
 		-- no update!
 		return
 	end
 
 	do
 		local currentZoneID = self.zoneData[zone][3]
-		local mapZoneID = GetCurrentMapContinent()*100 + GetCurrentMapZone()
+		local mapZoneID = GetCurrentMapContinent() * 100 + GetCurrentMapZone()
 		if currentZoneID ~= mapZoneID then
 			-- we are viewing a map that isn't the current zone (usually a continent
 			-- map), so the coordinates are wrong, unless we translate them
@@ -386,12 +408,14 @@ function Routes:DrawMinimapLines(forceUpdate)
 
 	local minimap_w = Minimap:GetWidth()
 	local minimap_h = Minimap:GetHeight()
-	local scale_x = minimap_w / (radius*2)
-	local scale_y = minimap_h / (radius*2)
+	local minimap_center_x = minimap_w / 2
+	local minimap_center_y = minimap_h / 2
+	-- scale yards to pixels independently per axis to support non-square minimaps/skins
+	local scale_x = minimap_w / (radius * 2)
+	local scale_y = minimap_h / (radius * 2)
+	local minimapScale = Minimap:GetEffectiveScale()
 
-	local minimapScale = Minimap:GetScale()
-	
-	for route_name, route_data in pairs( db.routes[ self.zoneData[zone][4] ] ) do
+	for route_name, route_data in pairs(db.routes[self.zoneData[zone][4]]) do
 		if type(route_data) == "table" and type(route_data.route) == "table" and #route_data.route > 1 then
 			-- store color/width
 			local width = (route_data.width_minimap or defaults.width_minimap) / (minimapScale)
@@ -400,9 +424,7 @@ function Routes:DrawMinimapLines(forceUpdate)
 			-- unless we show hidden
 			if (not route_data.hidden and (route_data.visible or not defaults.use_auto_showhide)) or defaults.show_hidden then
 				-- use this special color
-				if route_data.hidden then
-					color = defaults.hidden_color
-				end
+				if route_data.hidden then color = defaults.hidden_color end
 
 				-- some state data
 				local last_x = nil
@@ -410,16 +432,16 @@ function Routes:DrawMinimapLines(forceUpdate)
 				local last_inside = nil
 
 				-- if we loop - make sure the 'last' gets filled with the right info
-				if route_data.looped and route_data.route[ #route_data.route ] ~= defaults.fake_point then
-					local key = format("%s;%s", zone, route_data.route[ #route_data.route ])
-					last_x, last_y = X_cache[key], Y_cache[key]
+				if route_data.looped and route_data.route[#route_data.route] ~= defaults.fake_point then
+					local key = format("%s;%s", areaID, route_data.route[#route_data.route])
+					last_x, last_y = WX_cache[key], WY_cache[key]
 					if minimap_rotate then
 						local dx = last_x - cx
 						local dy = last_y - cy
-						last_x = cx + dx*cos - dy*sin
-						last_y = cy + dx*sin + dy*cos
+						last_x = cx + dx * cos - dy * sin
+						last_y = cy + dx * sin + dy * cos
 					end
-					last_inside = is_inside( last_x, last_y, cx, cy, radius )
+					last_inside = is_inside(last_x, last_y, cx, cy, radius)
 				end
 
 				-- loop over the route
@@ -433,25 +455,19 @@ function Routes:DrawMinimapLines(forceUpdate)
 						cur_y = nil
 						cur_inside = false
 					else
-						local key = format("%s;%s", zone, point)
-						cur_x, cur_y = X_cache[key], Y_cache[key]
+						local key = format("%s;%s", areaID, point)
+						cur_x, cur_y = WX_cache[key], WY_cache[key]
 						if minimap_rotate then
 							local dx = cur_x - cx
 							local dy = cur_y - cy
-							cur_x = cx + dx*cos - dy*sin
-							cur_y = cy + dx*sin + dy*cos
+							cur_x = cx + dx * cos - dy * sin
+							cur_y = cy + dx * sin + dy * cos
 						end
-						cur_inside = is_inside( cur_x, cur_y, cx, cy, radius )
+						cur_inside = is_inside(cur_x, cur_y, cx, cy, radius)
 					end
 
 					-- check if we have any nil values (we cant draw) and check boundingbox
-					if cur_x and cur_y and last_x and last_y and not (
-						( cur_x < minX and last_x < minX ) or
-						( cur_x > maxX and last_x > maxX ) or
-						( cur_y < minY and last_y < minY ) or
-						( cur_y > maxY and last_y > maxY )
-					)
-					then
+					if cur_x and cur_y and last_x and last_y and not ((cur_x < minX and last_x < minX) or (cur_x > maxX and last_x > maxX) or (cur_y < minY and last_y < minY) or (cur_y > maxY and last_y > maxY)) then
 						-- default all to not drawing
 						local draw_sx = nil
 						local draw_sy = nil
@@ -478,8 +494,7 @@ function Routes:DrawMinimapLines(forceUpdate)
 							if dy == 0 then dy = div_by_zero_nudge end
 
 							-- calculate intersection point
-							local nd = ((cx   -last_x)*(cy-zy) - (cx-zx)*(cy   -last_y)) /
-									   ((cur_x-last_x)*(cy-zy) - (cx-zx)*(cur_y-last_y))
+							local nd = ((cx - last_x) * (cy - zy) - (cx - zx) * (cy - last_y)) / ((cur_x - last_x) * (cy - zy) - (cx - zx) * (cur_y - last_y))
 
 							-- perpendicular point (closest to center on the line given)
 							local px = last_x + nd * -dx
@@ -490,11 +505,11 @@ function Routes:DrawMinimapLines(forceUpdate)
 							local dpc_y = cy - py
 
 							-- distance^2 of the perpendicular point
-							local lenpc = dpc_x*dpc_x + dpc_y*dpc_y
+							local lenpc = dpc_x * dpc_x + dpc_y * dpc_y
 
 							-- the line can only intersect if the perpendicular point is at
 							-- least closer than the furthest away point (one of the corners)
-							if lenpc < 2*radius2 then
+							if lenpc < 2 * radius2 then
 
 								-- if inside - ready to draw
 								if cur_inside then
@@ -503,14 +518,14 @@ function Routes:DrawMinimapLines(forceUpdate)
 								else
 									-- if we're not inside we can still be in the square - if so dont do any intersection
 									-- calculations yet
-									if math_abs( cur_x - cx ) < radius and math_abs( cur_y - cy ) < radius then
+									if math_abs(cur_x - cx) < radius and math_abs(cur_y - cy) < radius then
 										draw_ex = cur_x
 										draw_ey = cur_y
 									else
 										-- need to intersect against the square
 										-- likely x/y to intersect with
-										local minimap_cur_x  = cx + radius * (dx < 0 and 1 or -1)
-										local minimap_cur_y  = cy + radius * (dy < 0 and 1 or -1)
+										local minimap_cur_x = cx + radius * (dx < 0 and 1 or -1)
+										local minimap_cur_y = cy + radius * (dy < 0 and 1 or -1)
 
 										-- which intersection is furthest?
 										local delta_cur_x = (minimap_cur_x - cur_x) / -dx
@@ -519,45 +534,41 @@ function Routes:DrawMinimapLines(forceUpdate)
 										-- dark magic - needs to be changed to positive signs whenever i can care about it
 										if delta_cur_x < delta_cur_y and delta_cur_x < 0 then
 											draw_ex = minimap_cur_x
-											draw_ey = cur_y + -dy*delta_cur_x
+											draw_ey = cur_y + -dy * delta_cur_x
 										else
-											draw_ex = cur_x + -dx*delta_cur_y
+											draw_ex = cur_x + -dx * delta_cur_y
 											draw_ey = minimap_cur_y
 										end
 
 										-- check if we didn't calculate some wonky offset - has to be inside with
 										-- some slack on accuracy
-										if math_abs( draw_ex - cx ) > radius*1.01 or
-										   math_abs( draw_ey - cy ) > radius*1.01
-										then
+										if math_abs(draw_ex - cx) > radius * 1.01 or math_abs(draw_ey - cy) > radius * 1.01 then
 											draw_ex = nil
 											draw_ey = nil
 										end
 									end
 
 									-- we might have a round corner here - lets see if the quarter with the intersection is round
-									if draw_ex and draw_ey and is_round( draw_ex - cx, draw_ey - cy ) then
+									if draw_ex and draw_ey and is_round(draw_ex - cx, draw_ey - cy) then
 										-- if we are also within the circle-range
 										if lenpc < radius2 then
 											-- circle intersection
 											local dcx = cx - cur_x
 											local dcy = cy - cur_y
-											local len_dc = dcx*dcx + dcy*dcy
+											local len_dc = dcx * dcx + dcy * dcy
 
-											local len_d = dx*dx + dy*dy
-											local len_ddc = dx*dcx + dy*dcy
+											local len_d = dx * dx + dy * dy
+											local len_ddc = dx * dcx + dy * dcy
 
 											-- discriminant
-											local d_sqrt = ( len_ddc*len_ddc - len_d * (len_dc - radius2) )^0.5
+											local d_sqrt = (len_ddc * len_ddc - len_d * (len_dc - radius2)) ^ 0.5
 
 											-- calculate point
 											draw_ex = cur_x - dx * (-len_ddc + d_sqrt) / len_d
 											draw_ey = cur_y - dy * (-len_ddc + d_sqrt) / len_d
 
 											-- have to be on the *same* side of the perpendicular point else it's fake
-											if (draw_ex - px)/math_abs(draw_ex - px) ~= (cur_x- px)/math_abs(cur_x - px) or
-											   (draw_ey - py)/math_abs(draw_ey - py) ~= (cur_y- py)/math_abs(cur_y - py)
-											then
+											if (draw_ex - px) / math_abs(draw_ex - px) ~= (cur_x - px) / math_abs(cur_x - px) or (draw_ey - py) / math_abs(draw_ey - py) ~= (cur_y - py) / math_abs(cur_y - py) then
 												draw_ex = nil
 												draw_ey = nil
 											end
@@ -575,7 +586,7 @@ function Routes:DrawMinimapLines(forceUpdate)
 								else
 									-- if we're not inside we can still be in the square - if so dont do any intersection
 									-- calculations yet
-									if math_abs( last_x - cx ) < radius and math_abs( last_y - cy ) < radius then
+									if math_abs(last_x - cx) < radius and math_abs(last_y - cy) < radius then
 										draw_sx = last_x
 										draw_sy = last_y
 									else
@@ -591,45 +602,41 @@ function Routes:DrawMinimapLines(forceUpdate)
 										-- dark magic - needs to be changed to positive signs whenever i can care about it
 										if delta_last_x < delta_last_y and delta_last_x < 0 then
 											draw_sx = minimap_last_x
-											draw_sy = last_y + dy*delta_last_x
+											draw_sy = last_y + dy * delta_last_x
 										else
-											draw_sx = last_x + dx*delta_last_y
+											draw_sx = last_x + dx * delta_last_y
 											draw_sy = minimap_last_y
 										end
 
 										-- check if we didn't calculate some wonky offset - has to be inside with
 										-- some slack on accuracy
-										if math_abs( draw_sx - cx ) > radius*1.01 or
-										   math_abs( draw_sy - cy ) > radius*1.01
-										then
+										if math_abs(draw_sx - cx) > radius * 1.01 or math_abs(draw_sy - cy) > radius * 1.01 then
 											draw_sx = nil
 											draw_sy = nil
 										end
 									end
 
 									-- we might have a round corner here - lets see if the quarter with the intersection is round
-									if draw_sx and draw_sy and is_round( draw_sx - cx, draw_sy - cy ) then
+									if draw_sx and draw_sy and is_round(draw_sx - cx, draw_sy - cy) then
 										-- if we are also within the circle-range
 										if lenpc < radius2 then
 											-- circle intersection
 											local dcx = cx - cur_x
 											local dcy = cy - cur_y
-											local len_dc = dcx*dcx + dcy*dcy
+											local len_dc = dcx * dcx + dcy * dcy
 
-											local len_d = dx*dx + dy*dy
-											local len_ddc = dx*dcx + dy*dcy
+											local len_d = dx * dx + dy * dy
+											local len_ddc = dx * dcx + dy * dcy
 
 											-- discriminant
-											local d_sqrt = ( len_ddc*len_ddc - len_d * (len_dc - radius2) )^0.5
+											local d_sqrt = (len_ddc * len_ddc - len_d * (len_dc - radius2)) ^ 0.5
 
 											-- calculate point
 											draw_sx = cur_x - dx * (-len_ddc - d_sqrt) / len_d
 											draw_sy = cur_y - dy * (-len_ddc - d_sqrt) / len_d
 
 											-- have to be on the *same* side of the perpendicular point else it's fake
-											if (draw_sx - px)/math_abs(draw_sx - px) ~= (last_x- px)/math_abs(last_x - px) or
-											   (draw_sy - py)/math_abs(draw_sy - py) ~= (last_y- py)/math_abs(last_y - py)
-											then
+											if (draw_sx - px) / math_abs(draw_sx - px) ~= (last_x - px) / math_abs(last_x - px) or (draw_sy - py) / math_abs(draw_sy - py) ~= (last_y - py) / math_abs(last_y - py) then
 												draw_sx = nil
 												draw_sy = nil
 											end
@@ -643,40 +650,58 @@ function Routes:DrawMinimapLines(forceUpdate)
 						end
 
 						if draw_sx and draw_sy and draw_ex and draw_ey then
-							-- translate to left bottom corner and apply scale
-							draw_sx =			 (draw_sx - minX) * scale_x
-							draw_sy = minimap_h - (draw_sy - minY) * scale_y
-							draw_ex =			 (draw_ex - minX) * scale_x
-							draw_ey = minimap_h - (draw_ey - minY) * scale_y
+							-- Transform to minimap pixels using Astrolabe's axis mapping:
+							-- rotateMinimap ON:  (x, y) -> ( dx*scale_x,  dy*scale_y )
+							-- rotateMinimap OFF: (x, y) -> (-dy*scale_y, dx*scale_x)
+							local d1x = draw_sx - cx
+							local d1y = draw_sy - cy
+							local d2x = draw_ex - cx
+							local d2y = draw_ey - cy
+
+							if minimap_rotate then
+								draw_sx = minimap_center_x + d1x * scale_x
+								draw_sy = minimap_center_y + d1y * scale_y
+								draw_ex = minimap_center_x + d2x * scale_x
+								draw_ey = minimap_center_y + d2y * scale_y
+							else
+								draw_sx = minimap_center_x + (-d1y) * scale_y
+								draw_sy = minimap_center_y + (d1x) * scale_x
+								draw_ex = minimap_center_x + (-d2y) * scale_y
+								draw_ey = minimap_center_y + (d2x) * scale_x
+							end
 
 							if defaults.line_gaps then
 								-- shorten the line by 5 pixels (scaled) on endpoints inside the Minimap
 								local gapConst = 5 / minimapScale
 								local dx = draw_sx - draw_ex
 								local dy = draw_sy - draw_ey
-								local l = (dx*dx + dy*dy)^0.5
+								local l = (dx * dx + dy * dy) ^ 0.5
 								local x = gapConst * dx / l
 								local y = gapConst * dy / l
 								local shorten1, shorten2
-								if last_inside then shorten1 = true else shorten1 = false end
-								if cur_inside then shorten2 = true else shorten2 = false end
-								if shorten2 and route_data.metadata and defaults.line_gaps_skip_cluster and #route_data.metadata[i] > 1 then
-									shorten2 = false
-								end
-								if shorten1 and route_data.metadata and defaults.line_gaps_skip_cluster and #route_data.metadata[(i-1 == 0) and #route_data.route or i-1] > 1 then
+								if last_inside then
+									shorten1 = true
+								else
 									shorten1 = false
 								end
-								if shorten1 and shorten2 and l > (gapConst*2) then -- draw if line is 10 or more pixels (scaled)
-									G:DrawLine( Minimap, draw_sx-x, draw_sy-y, draw_ex+x, draw_ey+y, width, color, "ARTWORK")
+								if cur_inside then
+									shorten2 = true
+								else
+									shorten2 = false
+								end
+								if shorten2 and route_data.metadata and defaults.line_gaps_skip_cluster and #route_data.metadata[i] > 1 then shorten2 = false end
+								if shorten1 and route_data.metadata and defaults.line_gaps_skip_cluster and #route_data.metadata[(i - 1 == 0) and #route_data.route or i - 1] > 1 then shorten1 = false end
+								if shorten1 and shorten2 and l > (gapConst * 2) then -- draw if line is 10 or more pixels (scaled)
+									G:DrawLine(Minimap, draw_sx - x, draw_sy - y, draw_ex + x, draw_ey + y, width, color, "ARTWORK")
 								elseif shorten1 and not shorten2 and l > gapConst then
-									G:DrawLine( Minimap, draw_sx-x, draw_sy-y, draw_ex, draw_ey, width, color, "ARTWORK")
+									G:DrawLine(Minimap, draw_sx - x, draw_sy - y, draw_ex, draw_ey, width, color, "ARTWORK")
 								elseif shorten2 and not shorten1 and l > gapConst then
-									G:DrawLine( Minimap, draw_sx, draw_sy, draw_ex+x, draw_ey+y, width, color, "ARTWORK")
+									G:DrawLine(Minimap, draw_sx, draw_sy, draw_ex + x, draw_ey + y, width, color, "ARTWORK")
 								elseif not shorten1 and not shorten2 then
-									G:DrawLine( Minimap, draw_sx, draw_sy, draw_ex, draw_ey, width, color, "ARTWORK")
+									G:DrawLine(Minimap, draw_sx, draw_sy, draw_ex, draw_ey, width, color, "ARTWORK")
 								end
 							else
-								G:DrawLine( Minimap, draw_sx, draw_sy, draw_ex, draw_ey, width, color, "ARTWORK")
+								G:DrawLine(Minimap, draw_sx, draw_sy, draw_ex, draw_ey, width, color, "ARTWORK")
 							end
 						end
 					end
@@ -706,7 +731,7 @@ end)
 -- for inserting into relevant routes
 -- Zone name must be localized, node_name can be english or localized
 function Routes:InsertNode(zone, coord, node_name)
-	for route_name, route_data in pairs( db.routes[ self.zoneData[zone][4] ] ) do
+	for route_name, route_data in pairs(db.routes[self.zoneData[zone][4]]) do
 		-- for every route check if the route is created with this node
 		if route_data.selection then
 			for k, v in pairs(route_data.selection) do
@@ -714,11 +739,7 @@ function Routes:InsertNode(zone, coord, node_name)
 					-- Add the node
 					local x, y = self:getXY(coord)
 					local flag = false
-					for tabooname, used in pairs(route_data.taboos) do
-						if used and self:IsNodeInTaboo(x, y, db.taboo[ self.zoneData[zone][4] ][tabooname]) then
-							flag = true
-						end
-					end
+					for tabooname, used in pairs(route_data.taboos) do if used and self:IsNodeInTaboo(x, y, db.taboo[self.zoneData[zone][4]][tabooname]) then flag = true end end
 					if flag then
 						tinsert(route_data.taboolist, coord)
 					else
@@ -736,7 +757,7 @@ end
 -- for deleting into relevant routes
 -- Zone name must be localized, node_name can be english or localized
 function Routes:DeleteNode(zone, coord, node_name)
-	for route_name, route_data in pairs( db.routes[ self.zoneData[zone][4] ] ) do
+	for route_name, route_data in pairs(db.routes[self.zoneData[zone][4]]) do
 		-- for every route check if the route is created with this node
 		if route_data.selection then
 			local flag = false
@@ -754,7 +775,7 @@ function Routes:DeleteNode(zone, coord, node_name)
 									local cx, cy = self:getXY(route_data.route[i])
 									if num_data > 1 then
 										-- more than 1 node in this cluster
-										cx, cy = (cx * num_data - x) / (num_data-1), (cy * num_data - y) / (num_data-1)
+										cx, cy = (cx * num_data - x) / (num_data - 1), (cy * num_data - y) / (num_data - 1)
 										tremove(route_data.metadata[i], j)
 										route_data.route[i] = self:getID(cx, cy)
 									else
@@ -831,13 +852,8 @@ function Routes:UpgradeStorageFormat1()
 	t = nil
 
 	-- Delete invalid zones from the taboo table
-	for zone, zone_table in pairs(db.taboo) do
-		if self.zoneMapFile[zone] == nil then
-			db.taboo[zone] = nil
-		end
-	end
+	for zone, zone_table in pairs(db.taboo) do if self.zoneMapFile[zone] == nil then db.taboo[zone] = nil end end
 end
-
 
 -- Common subtables for zone and table description
 local route_zone_args_desc_table = {
@@ -845,30 +861,21 @@ local route_zone_args_desc_table = {
 	name = function(info)
 		local zone = info[2]
 		local count = 0
-		for route_name, route_table in pairs(db.routes[zone]) do
-			if #route_table.route > 0 then
-				count = count + 1
-			end
-		end
+		for route_name, route_table in pairs(db.routes[zone]) do if #route_table.route > 0 then count = count + 1 end end
 		return L["You have |cffffd200%d|r route(s) in |cffffd200%s|r."]:format(count, Routes.zoneMapFile[zone])
 	end,
-	order = 0,
+	order = 0
 }
 local taboo_zone_args_desc_table = {
 	type = "description",
 	name = function(info)
 		local zone = info[2]
 		local count = 0
-		for taboo_name, taboo_table in pairs(db.taboo[zone]) do
-			if #taboo_table.route > 0 then
-				count = count + 1
-			end
-		end
+		for taboo_name, taboo_table in pairs(db.taboo[zone]) do if #taboo_table.route > 0 then count = count + 1 end end
 		return L["You have |cffffd200%d|r taboo region(s) in |cffffd200%s|r."]:format(count, Routes.zoneMapFile[zone])
 	end,
-	order = 0,
+	order = 0
 }
-
 
 ------------------------------------------------------------------------------------------------------
 -- General event functions
@@ -883,9 +890,7 @@ function Routes:OnInitialize()
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Routes", options)
 	local f = function() LibStub("AceConfigDialog-3.0"):Open("Routes") end
 	self:RegisterChatCommand(L["routes"], f)
-	if L["routes"] ~= "routes" then
-		self:RegisterChatCommand("routes", f)
-	end
+	if L["routes"] ~= "routes" then self:RegisterChatCommand("routes", f) end
 
 	-- Upgrade old storage format (which was dependant on LibBabble-Zone-3.0
 	-- to the new format that doesn't require it
@@ -905,8 +910,8 @@ function Routes:OnInitialize()
 				name = localizedZoneName,
 				desc = L["Routes in %s"]:format(localizedZoneName),
 				args = {
-					desc = route_zone_args_desc_table,
-				},
+					desc = route_zone_args_desc_table
+				}
 			}
 			self.routekeys[zone] = {}
 			for route, route_table in pairs(zone_table) do
@@ -931,8 +936,8 @@ function Routes:OnInitialize()
 				name = localizedZoneName,
 				desc = L["Taboos in %s"]:format(localizedZoneName),
 				args = {
-					desc = taboo_zone_args_desc_table,
-				},
+					desc = taboo_zone_args_desc_table
+				}
 			}
 			self.tabookeys[zone] = {}
 			for taboo in pairs(zone_table) do
@@ -952,30 +957,22 @@ timerFrame.elapsed = 0
 timerFrame:SetScript("OnUpdate", function(self, elapsed)
 	self.elapsed = self.elapsed + elapsed
 	if self.elapsed > 0.025 or self.force then -- throttle to a max of 40 redraws per sec
-		self.elapsed = 0                       -- kinda unnecessary since at default 1 yard refresh, its limited to 36 redraws/sec
-		Routes:DrawMinimapLines(self.force)    -- only need 25 redraws/sec to perceive smooth motion anyway
+		self.elapsed = 0 -- kinda unnecessary since at default 1 yard refresh, its limited to 36 redraws/sec
+		Routes:DrawMinimapLines(self.force) -- only need 25 redraws/sec to perceive smooth motion anyway
 		self.force = nil
 	end
 end)
 
-local function SetZoomHook()
-	timerFrame.force = true
-end
+local function SetZoomHook() timerFrame.force = true end
 
 function Routes:MINIMAP_UPDATE_ZOOM()
 	local zoom = Minimap:GetZoom()
-	if GetCVar("minimapZoom") == GetCVar("minimapInsideZoom") then
-		Minimap:SetZoom(zoom < 2 and zoom + 1 or zoom - 1)
-	end
-	indoors = GetCVar("minimapZoom")+0 == Minimap:GetZoom() and "outdoor" or "indoor"
+	if GetCVar("minimapZoom") == GetCVar("minimapInsideZoom") then Minimap:SetZoom(zoom < 2 and zoom + 1 or zoom - 1) end
+	indoors = GetCVar("minimapZoom") + 0 == Minimap:GetZoom() and "outdoor" or "indoor"
 	Minimap:SetZoom(zoom)
 end
 
-function Routes:CVAR_UPDATE(event, cvar, value)
-	if cvar == "ROTATE_MINIMAP" then
-		minimap_rotate = value == "1"
-	end
-end
+function Routes:CVAR_UPDATE(event, cvar, value) if cvar == "ROTATE_MINIMAP" then minimap_rotate = value == "1" end end
 
 function Routes:OnEnable()
 	-- World Map line drawing
@@ -991,20 +988,12 @@ function Routes:OnEnable()
 		-- Notes: Do not call self:MINIMAP_UPDATE_ZOOM() here because the CVARs aren't applied yet.
 		-- MINIMAP_UPDATE_ZOOM gets fired automatically by wow when it applies the CVARs.
 	end
-	for addon, plugin_table in pairs(Routes.plugins) do
-		if db.defaults.callbacks[addon] and plugin_table.IsActive() then
-			plugin_table.AddCallbacks()
-		end
-	end
+	for addon, plugin_table in pairs(Routes.plugins) do if db.defaults.callbacks[addon] and plugin_table.IsActive() then plugin_table.AddCallbacks() end end
 end
 
 function Routes:OnDisable()
 	-- Ace3 unregisters all events and hooks for us on disable
-	for addon, plugin_table in pairs(Routes.plugins) do
-		if db.defaults.callbacks[addon] and plugin_table.IsActive() then
-			plugin_table.RemoveCallbacks()
-		end
-	end
+	for addon, plugin_table in pairs(Routes.plugins) do if db.defaults.callbacks[addon] and plugin_table.IsActive() then plugin_table.RemoveCallbacks() end end
 	timerFrame:Hide()
 end
 
@@ -1012,9 +1001,7 @@ function Routes:ADDON_LOADED(event, addon)
 	if self.plugins[addon] then
 		options.args.add_group.args[addon].disabled = false
 		options.args.add_group.args[addon].guiHidden = false
-		if db.defaults.callbacks[addon] and self.plugins[addon].IsActive() then
-			self.plugins[addon].AddCallbacks()
-		end
+		if db.defaults.callbacks[addon] and self.plugins[addon].IsActive() then self.plugins[addon].AddCallbacks() end
 	end
 end
 
@@ -1031,28 +1018,22 @@ do
 		wipe(t)
 		for i = 1, select("#", ...) do
 			local key = select(i, ...)
-			if key ~= "" then
-				tinsert(t, key)
-			end
+			if key ~= "" then tinsert(t, key) end
 		end
 		return t
 	end
 
-	function KeybindHelper:GetKeybind(info)
-		return table.concat(self:MakeKeyBindingTable(GetBindingKey(info.arg)), ", ")
-	end
+	function KeybindHelper:GetKeybind(info) return table.concat(self:MakeKeyBindingTable(GetBindingKey(info.arg)), ", ") end
 
 	function KeybindHelper:SetKeybind(info, key)
 		if key == "" then
 			local t = self:MakeKeyBindingTable(GetBindingKey(info.arg))
-			for i = 1, #t do
-				SetBinding(t[i])
-			end
+			for i = 1, #t do SetBinding(t[i]) end
 		else
 			local oldAction = GetBindingAction(key)
 			local frame = LibStub("AceConfigDialog-3.0").OpenFrames["Routes"]
 			if frame then
-				if ( oldAction ~= "" and oldAction ~= info.arg ) then
+				if (oldAction ~= "" and oldAction ~= info.arg) then
 					frame:SetStatusText(KEY_UNBOUND_ERROR:format(GetBindingText(oldAction, "BINDING_NAME_")))
 				else
 					frame:SetStatusText(KEY_BOUND)
@@ -1064,40 +1045,43 @@ do
 	end
 end
 
-
 options = {
 	type = "group",
 	name = L["Routes"],
 	get = function(k) return db.defaults[k.arg] end,
-	set = function(k, v) db.defaults[k.arg] = v; Routes:DrawWorldmapLines(); Routes:DrawMinimapLines(true); end,
+	set = function(k, v)
+		db.defaults[k.arg] = v;
+		Routes:DrawWorldmapLines();
+		Routes:DrawMinimapLines(true);
+	end,
 	args = {
 		options_group = {
 			type = "group",
 			name = L["Options"],
 			desc = L["Options"],
-			order = 0,
-			--args = {}, -- defined later
+			order = 0
+			-- args = {}, -- defined later
 		},
 		add_group = {
 			type = "group",
 			name = L["Add"],
 			desc = L["Add"],
-			order = 100,
-			--args = {}, -- defined later
+			order = 100
+			-- args = {}, -- defined later
 		},
 		routes_group = {
 			type = "group",
 			name = L["Routes"],
 			desc = L["Routes"],
 			order = 200,
-			args = {}, -- populated in Routes:OnInitialize()
+			args = {} -- populated in Routes:OnInitialize()
 		},
 		taboo_group = {
 			type = "group",
 			name = L["Taboos"],
 			desc = L["Taboos"],
 			order = 250,
-			args = {}, -- populated in Routes:OnInitialize()
+			args = {} -- populated in Routes:OnInitialize()
 		},
 		faq_group = {
 			type = "group",
@@ -1114,14 +1098,14 @@ options = {
 						header = {
 							type = "header",
 							name = L["Overview"],
-							order = 0,
+							order = 0
 						},
 						desc = {
 							type = "description",
 							name = L["OVERVIEW_TEXT"],
-							order = 1,
-						},
-					},
+							order = 1
+						}
+					}
 				},
 				create_route = {
 					type = "group",
@@ -1132,14 +1116,14 @@ options = {
 						header = {
 							type = "header",
 							name = L["Creating a route"],
-							order = 0,
+							order = 0
 						},
 						desc = {
 							type = "description",
 							name = L["CREATE_ROUTE_TEXT"],
-							order = 1,
-						},
-					},
+							order = 1
+						}
+					}
 				},
 				optimizing_route = {
 					type = "group",
@@ -1150,14 +1134,14 @@ options = {
 						header = {
 							type = "header",
 							name = L["Optimizing a route"],
-							order = 0,
+							order = 0
 						},
 						desc = {
 							type = "description",
 							name = L["OPTIMIZING_ROUTE_TEXT"],
-							order = 1,
-						},
-					},
+							order = 1
+						}
+					}
 				},
 				customizing_route = {
 					type = "group",
@@ -1168,14 +1152,14 @@ options = {
 						header = {
 							type = "header",
 							name = L["Customizing route display"],
-							order = 0,
+							order = 0
 						},
 						desc = {
 							type = "description",
 							name = L["CUSTOMIZING_ROUTE_TEXT"],
-							order = 1,
-						},
-					},
+							order = 1
+						}
+					}
 				},
 				create_taboos = {
 					type = "group",
@@ -1186,14 +1170,14 @@ options = {
 						header = {
 							type = "header",
 							name = L["Creating a taboo region"],
-							order = 0,
+							order = 0
 						},
 						desc = {
 							type = "description",
 							name = L["CREATE_TABOOS_TEXT"],
-							order = 1,
-						},
-					},
+							order = 1
+						}
+					}
 				},
 				waypoints_integration = {
 					type = "group",
@@ -1204,14 +1188,14 @@ options = {
 						header = {
 							type = "header",
 							name = L["Waypoints Integration"],
-							order = 0,
+							order = 0
 						},
 						desc = {
 							type = "description",
 							name = L["WAYPOINTS_INTEGRATION_TEXT"],
-							order = 1,
-						},
-					},
+							order = 1
+						}
+					}
 				},
 				auto_update = {
 					type = "group",
@@ -1222,14 +1206,14 @@ options = {
 						header = {
 							type = "header",
 							name = L["Automatic route updating"],
-							order = 0,
+							order = 0
 						},
 						desc = {
 							type = "description",
 							name = L["AUTOMATIC_UPDATE_TEXT"],
-							order = 1,
-						},
-					},
+							order = 1
+						}
+					}
 				},
 				faq = {
 					type = "group",
@@ -1240,29 +1224,31 @@ options = {
 						header = {
 							type = "header",
 							name = L["Frequently Asked Questions"],
-							order = 0,
+							order = 0
 						},
 						desc = {
 							type = "description",
 							name = L["FAQ_TEXT"],
-							order = 1,
-						},
-					},
-				},
-			},
-		},
+							order = 1
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
 options.args.options_group.args = {
 	-- Mapdrawing menu entry
 	drawing = {
-		name = L["Map Drawing"], type = "group",
+		name = L["Map Drawing"],
+		type = "group",
 		desc = L["Map Drawing"],
 		order = 100,
 		args = {
 			linedisplay_group = {
-				name = L["Toggle drawing on each of the maps."], type = "group",
+				name = L["Toggle drawing on each of the maps."],
+				type = "group",
 				desc = L["Toggle drawing on each of the maps."],
 				inline = true,
 				order = 100,
@@ -1272,15 +1258,15 @@ options.args.options_group.args = {
 						desc = L["Worldmap drawing"],
 						type = "toggle",
 						order = 100,
-						arg = "draw_worldmap",
+						arg = "draw_worldmap"
 					},
 					minimap_toggle = {
 						name = L["Minimap"],
 						desc = L["Minimap drawing"],
-						type  = "toggle",
+						type = "toggle",
 						order = 200,
-						get  = function(info) return db.defaults.draw_minimap end,
-						set  = function(info, v)
+						get = function(info) return db.defaults.draw_minimap end,
+						set = function(info, v)
 							db.defaults.draw_minimap = v
 							if v then
 								Routes:RegisterEvent("MINIMAP_UPDATE_ZOOM")
@@ -1288,7 +1274,7 @@ options.args.options_group.args = {
 								timerFrame:Show()
 								Routes:RegisterEvent("MINIMAP_ZONE_CHANGED", "DrawMinimapLines", true)
 								minimap_rotate = GetCVar("rotateMinimap") == "1"
-								Routes:MINIMAP_UPDATE_ZOOM()  -- This has a DrawMinimapLines(true) call in it, and sets an "indoors" variable
+								Routes:MINIMAP_UPDATE_ZOOM() -- This has a DrawMinimapLines(true) call in it, and sets an "indoors" variable
 							else
 								Routes:UnregisterEvent("MINIMAP_UPDATE_ZOOM")
 								Routes:UnregisterEvent("CVAR_UPDATE")
@@ -1296,149 +1282,174 @@ options.args.options_group.args = {
 								Routes:UnregisterEvent("MINIMAP_ZONE_CHANGED")
 								G:HideLines(Minimap)
 							end
-						end,
+						end
 					},
 					battlemap_toggle = {
 						name = L["Zone Map"],
 						desc = L["Zone Map drawing"],
-						type  = "toggle",
+						type = "toggle",
 						order = 300,
-						arg = "draw_battlemap",
+						arg = "draw_battlemap"
 					},
 					indoors_toggle = {
 						name = L["Minimap when indoors"],
 						desc = L["Draw on minimap when indoors"],
-						type  = "toggle",
+						type = "toggle",
 						order = 400,
 						arg = "draw_indoors",
-						disabled = function() return not db.defaults.draw_minimap end,
-					},
-				},
+						disabled = function() return not db.defaults.draw_minimap end
+					}
+				}
 			},
 			default_group = {
-				name = L["Set the width of lines on each of the maps."], type = "group",
+				name = L["Set the width of lines on each of the maps."],
+				type = "group",
 				desc = L["Normal lines"],
 				inline = true,
 				order = 200,
 				args = {
 					width = {
-						name = L["Worldmap"], type = "range",
+						name = L["Worldmap"],
+						type = "range",
 						desc = L["Width of the line in the Worldmap"],
-						min = 10, max = 100, step = 1,
+						min = 10,
+						max = 100,
+						step = 1,
 						arg = "width",
-						order = 100,
+						order = 100
 					},
 					width_minimap = {
-						name = L["Minimap"], type = "range",
+						name = L["Minimap"],
+						type = "range",
 						desc = L["Width of the line in the Minimap"],
-						min = 10, max = 100, step = 1,
+						min = 10,
+						max = 100,
+						step = 1,
 						arg = "width_minimap",
-						order = 110,
+						order = 110
 					},
 					width_battlemap = {
-						name = L["Zone Map"], type = "range",
+						name = L["Zone Map"],
+						type = "range",
 						desc = L["Width of the line in the Zone Map"],
-						min = 10, max = 100, step = 1,
+						min = 10,
+						max = 100,
+						step = 1,
 						arg = "width_battlemap",
-						order = 120,
-					},
-				},
+						order = 120
+					}
+				}
 			},
 			color_group = {
-				name = L["Color of lines"], type = "group",
+				name = L["Color of lines"],
+				type = "group",
 				desc = L["Color of lines"],
 				inline = true,
 				order = 300,
 				get = function(info) return unpack(db.defaults[info.arg]) end,
 				set = function(info, r, g, b, a)
 					local c = db.defaults[info.arg]
-					c[1] = r; c[2] = g; c[3] = b; c[4] = a
+					c[1] = r;
+					c[2] = g;
+					c[3] = b;
+					c[4] = a
 					Routes:DrawWorldmapLines()
 					Routes:DrawMinimapLines(true)
 				end,
 				args = {
 					color = {
-						name = L["Default route"], type = "color",
+						name = L["Default route"],
+						type = "color",
 						desc = L["Change default route color"],
-						arg  = "color",
+						arg = "color",
 						hasAlpha = true,
-						order = 200,
+						order = 200
 					},
 					hidden_color = {
-						name = L["Hidden route"], type = "color",
+						name = L["Hidden route"],
+						type = "color",
 						desc = L["Change default hidden route color"],
-						arg  = "hidden_color",
+						arg = "hidden_color",
 						hasAlpha = true,
-						order = 400,
-					},
-				},
+						order = 400
+					}
+				}
 			},
 			line_gaps_group = {
-				name = L["Line gaps"], type = "group",
+				name = L["Line gaps"],
+				type = "group",
 				desc = L["Line gaps"],
 				inline = true,
 				order = 400,
 				args = {
 					line_gaps = {
-						name = L["Draw line gaps"], type = "toggle",
+						name = L["Draw line gaps"],
+						type = "toggle",
 						desc = L["Shorten the lines drawn on the minimap slightly so that they do not overlap the icons and minimap tracking blips."],
-						arg  = "line_gaps",
-						order = 400,
+						arg = "line_gaps",
+						order = 400
 					},
 					line_gaps_skip_cluster = {
-						name = L["Skip clustered node points"], type = "toggle",
+						name = L["Skip clustered node points"],
+						type = "toggle",
 						desc = L["Do not draw gaps for clustered node points in routes."],
-						arg  = "line_gaps_skip_cluster",
+						arg = "line_gaps_skip_cluster",
 						disabled = function() return not db.defaults.line_gaps end,
-						order = 400,
-					},
-				},
+						order = 400
+					}
+				}
 			},
 			show_hidden = {
-				name = L["Show hidden routes"], type = "toggle",
+				name = L["Show hidden routes"],
+				type = "toggle",
 				desc = L["Show hidden routes?"],
-				arg  = "show_hidden",
-				order = 450,
+				arg = "show_hidden",
+				order = 450
 			},
 			update_distance = {
-				name = L["Update distance"], type = "range",
+				name = L["Update distance"],
+				type = "range",
 				desc = L["Yards to move before triggering a minimap update"],
-				min = 0, max = 10, step = 0.1,
+				min = 0,
+				max = 10,
+				step = 0.1,
 				arg = "update_distance",
-				order = 500,
-			},
-		},
-	},
+				order = 500
+			}
+		}
+	}
 }
-
 
 -- Set of functions we use to edit route configs
 local ConfigHandler = {}
 
 function ConfigHandler:GetColor(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	return unpack(db.routes[zone][route].color or db.defaults.color)
 end
 function ConfigHandler:SetColor(info, r, g, b, a)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	local t = db.routes[zone][route]
 	t.color = t.color or {}
 	t = t.color
-	t[1] = r; t[2] = g; t[3] = b; t[4] = a;
+	t[1] = r;
+	t[2] = g;
+	t[3] = b;
+	t[4] = a;
 	Routes:DrawWorldmapLines()
 	Routes:DrawMinimapLines(true)
 end
 
 function ConfigHandler:GetHidden(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	return db.routes[zone][route].hidden
 end
 function ConfigHandler:SetHidden(info, v)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	db.routes[zone][route].hidden = v
 	Routes:DrawWorldmapLines()
 	Routes:DrawMinimapLines(true)
@@ -1446,36 +1457,36 @@ end
 
 function ConfigHandler:GetWidth(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	return db.routes[zone][route].width or db.defaults.width
 end
 function ConfigHandler:SetWidth(info, v)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	db.routes[zone][route].width = v
 	Routes:DrawWorldmapLines()
 end
 
 function ConfigHandler:GetWidthMinimap(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	return db.routes[zone][route].width_minimap or db.defaults.width_minimap
 end
 function ConfigHandler:SetWidthMinimap(info, v)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	db.routes[zone][route].width_minimap = v
 	Routes:DrawMinimapLines(true)
 end
 
 function ConfigHandler:GetWidthBattleMap(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	return db.routes[zone][route].width_battlemap or db.defaults.width_battlemap
 end
 function ConfigHandler:SetWidthBattleMap(info, v)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	db.routes[zone][route].width_battlemap = v
 	Routes:DrawWorldmapLines()
 end
@@ -1490,7 +1501,7 @@ function ConfigHandler:DeleteRoute(info)
 		return
 	end
 	db.routes[zone][route] = nil
-	--local routekey = route:gsub("%s", "\255") -- can't have spaces in the key
+	-- local routekey = route:gsub("%s", "\255") -- can't have spaces in the key
 	options.args.routes_group.args[zone].args[routekey] = nil -- delete route from aceopt
 	Routes.routekeys[zone][routekey] = nil
 	if next(db.routes[zone]) == nil then
@@ -1504,7 +1515,7 @@ end
 
 function ConfigHandler:ClusterRoute(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	local t = db.routes[zone][route]
 	t.route, t.metadata, t.length = Routes.TSP:ClusterRoute(db.routes[zone][route].route, Routes.zoneMapFile[zone], db.defaults.cluster_dist)
 	t.cluster_dist = db.defaults.cluster_dist
@@ -1514,12 +1525,12 @@ end
 
 function ConfigHandler:UnClusterRoute(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	local t = db.routes[zone][route]
 	local num = 0
 	for i = 1, #t.metadata do
 		for j = 1, #t.metadata[i] do
-			num = num+1
+			num = num + 1
 			t.route[num] = t.metadata[i][j]
 		end
 	end
@@ -1532,7 +1543,7 @@ end
 
 function ConfigHandler:IsCluster(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	local t = db.routes[zone][route]
 	if t.metadata then
 		return true
@@ -1540,20 +1551,14 @@ function ConfigHandler:IsCluster(info)
 		return false
 	end
 end
-function ConfigHandler:IsNotCluster(info)
-	return not self:IsCluster(info)
-end
+function ConfigHandler:IsNotCluster(info) return not self:IsCluster(info) end
 
-function ConfigHandler:GetDefaultClusterDist()
-	return db.defaults.cluster_dist
-end
-function ConfigHandler:SetDefaultClusterDist(info, v)
-	db.defaults.cluster_dist = v
-end
+function ConfigHandler:GetDefaultClusterDist() return db.defaults.cluster_dist end
+function ConfigHandler:SetDefaultClusterDist(info, v) db.defaults.cluster_dist = v end
 
 function ConfigHandler:ResetLineSettings(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	local t = db.routes[zone][route]
 	t.color = nil
 	t.width = nil
@@ -1565,28 +1570,24 @@ end
 
 function ConfigHandler.GetRouteDesc(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	local t = db.routes[zone][route]
 	return L["This route has |cffffd200%d|r nodes and is |cffffd200%d|r yards long."]:format(#t.route, t.length)
 end
 
 function ConfigHandler.GetShortClusterDesc(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	local t = db.routes[zone][route]
-	if not t.metadata then
-		return L["This route is not a clustered route."]
-	end
+	if not t.metadata then return L["This route is not a clustered route."] end
 	local numNodes = 0
-	for i = 1, #t.metadata do
-		numNodes = numNodes + #t.metadata[i]
-	end
+	for i = 1, #t.metadata do numNodes = numNodes + #t.metadata[i] end
 	return L["This route is a clustered route, down from the original |cffffd200%d|r nodes."]:format(numNodes)
 end
 
 function ConfigHandler.GetRouteClusterRadiusDesc(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	local t = db.routes[zone][route]
 	if t.metadata then
 		return L["The cluster radius of this route is |cffffd200%d|r yards."]:format(t.cluster_dist or 65) -- 65 was an old default
@@ -1598,20 +1599,20 @@ do
 	function ConfigHandler.GetDataDesc(info)
 		wipe(str)
 		local zone = info[2]
-		local route = Routes.routekeys[zone][ info[3] ]
+		local route = Routes.routekeys[zone][info[3]]
 		local t = db.routes[zone][route]
 		local num = 1
 		str[num] = L["This route has nodes that belong to the following categories:"]
 		for k in pairs(t.db_type) do
 			num = num + 1
-			str[num] = "|cffffd200     "..L[k].."|r"
+			str[num] = "|cffffd200     " .. L[k] .. "|r"
 		end
 		num = num + 1
 		str[num] = L["This route contains the following nodes:"]
 		for k, v in pairs(t.selection) do
 			num = num + 1
 			if v == true then v = k end
-			str[num] = "|cffffd200     "..v.."|r"
+			str[num] = "|cffffd200     " .. v .. "|r"
 		end
 		return table.concat(str, "\n")
 	end
@@ -1621,11 +1622,9 @@ do
 		wipe(str)
 		wipe(data)
 		local zone = info[2]
-		local route = Routes.routekeys[zone][ info[3] ]
+		local route = Routes.routekeys[zone][info[3]]
 		local t = db.routes[zone][route]
-		if not t.metadata then
-			return L["This route is not a clustered route."]
-		end
+		if not t.metadata then return L["This route is not a clustered route."] end
 
 		local numNodes = 0
 		local maxt = 0
@@ -1637,15 +1636,13 @@ do
 			local x, y = floor(t.route[i] / 10000) / 10000, (t.route[i] % 10000) / 10000
 			for j = 1, numData do
 				local x2, y2 = floor(t.metadata[i][j] / 10000) / 10000, (t.metadata[i][j] % 10000) / 10000 -- to round off the coordinate
-				local t = (((x2 - x)*zoneW)^2 + ((y2 - y)*zoneH)^2)^0.5 - 0.0001
+				local t = (((x2 - x) * zoneW) ^ 2 + ((y2 - y) * zoneH) ^ 2) ^ 0.5 - 0.0001
 				t = floor(t / 10)
 				data[t] = (data[t] or 0) + 1
 				if t > maxt then maxt = t end
 			end
 		end
-		for i = 0, maxt do
-			str[i+4] = L["|cffffd200     %d|r node(s) are between |cffffd200%d|r-|cffffd200%d|r yards of a cluster point"]:format(data[i] or 0, i*10+1, i*10+10)
-		end
+		for i = 0, maxt do str[i + 4] = L["|cffffd200     %d|r node(s) are between |cffffd200%d|r-|cffffd200%d|r yards of a cluster point"]:format(data[i] or 0, i * 10 + 1, i * 10 + 10) end
 		str[1] = L["This route is a clustered route, down from the original |cffffd200%d|r nodes."]:format(numNodes)
 		str[2] = L["The cluster radius of this route is |cffffd200%d|r yards."]:format(t.cluster_dist or 65) -- 65 was an old default
 		str[3] = L["|cffffd200     %d|r node(s) are at |cffffd2000|r yards of a cluster point"]:format(data[-1] or 0)
@@ -1655,37 +1652,31 @@ do
 	function ConfigHandler.GetTabooDesc(info)
 		wipe(str)
 		local zone = info[2]
-		local route = Routes.routekeys[zone][ info[3] ]
+		local route = Routes.routekeys[zone][info[3]]
 		local t = db.routes[zone][route]
 		local num = 1
 		str[num] = L["This route has the following taboo regions:"]
 		for k, v in pairs(t.taboos) do
 			if v then
 				num = num + 1
-				str[num] = "|cffffd200     "..k.."|r"
+				str[num] = "|cffffd200     " .. k .. "|r"
 			else
 				t.taboos[k] = nil -- set the false value to nil, so we don't pairs() over it in the future
 			end
 		end
-		if num == 1 then
-			str[num] = L["This route has no taboo regions."]
-		end
+		if num == 1 then str[num] = L["This route has no taboo regions."] end
 		num = num + 1
 		str[num] = L["This route contains |cffffd200%d|r nodes that have been tabooed."]:format(#t.taboolist)
 		return table.concat(str, "\n")
 	end
 end
 
-function ConfigHandler:GetTwoPointFiveOpt()
-	return db.defaults.tsp.two_point_five_opt
-end
-function ConfigHandler:SetTwoPointFiveOpt(info, v)
-	db.defaults.tsp.two_point_five_opt = v
-end
+function ConfigHandler:GetTwoPointFiveOpt() return db.defaults.tsp.two_point_five_opt end
+function ConfigHandler:SetTwoPointFiveOpt(info, v) db.defaults.tsp.two_point_five_opt = v end
 
 function ConfigHandler:DoForeground(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	local t = db.routes[zone][route]
 	if #t.route > 724 then
 		-- Lua has 4mb limit on table size. 725x725 will result in a table of size 525625
@@ -1694,11 +1685,7 @@ function ConfigHandler:DoForeground(info)
 		return
 	end
 	local taboos = {}
-	for tabooname, used in pairs(t.taboos) do
-		if used then
-			tinsert(taboos, db.taboo[zone][tabooname])
-		end
-	end
+	for tabooname, used in pairs(t.taboos) do if used then tinsert(taboos, db.taboo[zone][tabooname]) end end
 	local output, meta, length, iter, timetaken = Routes.TSP:SolveTSP(t.route, t.metadata, taboos, Routes.zoneMapFile[zone], db.defaults.tsp)
 	t.route = output
 	t.length = length
@@ -1707,27 +1694,21 @@ function ConfigHandler:DoForeground(info)
 
 	-- redraw lines
 	local AutoShow = Routes:GetModule("AutoShow", true)
-	if AutoShow and db.defaults.use_auto_showhide then
-		AutoShow:ApplyVisibility()
-	end
+	if AutoShow and db.defaults.use_auto_showhide then AutoShow:ApplyVisibility() end
 	Routes:DrawWorldmapLines()
 	Routes:DrawMinimapLines(true)
 end
 
 function ConfigHandler:DoBackground(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	local t = db.routes[zone][route]
 	if #t.route > 724 then
 		Routes:Print(L["TOO_MANY_NODES_ERROR"])
 		return
 	end
 	local taboos = {}
-	for tabooname, used in pairs(t.taboos) do
-		if used then
-			tinsert(taboos, db.taboo[zone][tabooname])
-		end
-	end
+	for tabooname, used in pairs(t.taboos) do if used then tinsert(taboos, db.taboo[zone][tabooname]) end end
 	local running, errormsg = Routes.TSP:SolveTSPBackground(t.route, t.metadata, taboos, Routes.zoneMapFile[zone], db.defaults.tsp)
 	if (running == 1) then
 		Routes:Print(L["Now running TSP in the background..."])
@@ -1738,9 +1719,7 @@ function ConfigHandler:DoBackground(info)
 			Routes:Print(L["Path with %d nodes found with length %.2f yards after %d iterations in %.2f seconds."]:format(#output, length, iter, timetaken))
 			-- redraw lines
 			local AutoShow = Routes:GetModule("AutoShow", true)
-			if AutoShow and db.defaults.use_auto_showhide then
-				AutoShow:ApplyVisibility()
-			end
+			if AutoShow and db.defaults.use_auto_showhide then AutoShow:ApplyVisibility() end
 			Routes:DrawWorldmapLines()
 			Routes:DrawMinimapLines(true)
 		end)
@@ -1757,20 +1736,18 @@ do
 	local t = {}
 	function ConfigHandler:GetTabooRegions(info)
 		for k, v in pairs(t) do t[k] = nil end
-		for k, v in pairs(db.taboo[ info[2] ]) do
-			t[k] = k
-		end
+		for k, v in pairs(db.taboo[info[2]]) do t[k] = k end
 		return t
 	end
 end
 function ConfigHandler:GetTabooRegionStatus(info, k)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	return db.routes[zone][route].taboos[k]
 end
 function ConfigHandler:SetTabooRegionStatus(info, k, v)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	if v == false then v = nil end
 	local route_data = db.routes[zone][route]
 	local taboo_data = db.taboo[zone][k]
@@ -1786,12 +1763,12 @@ function ConfigHandler:SetTabooRegionStatus(info, k, v)
 end
 function ConfigHandler:IsBeingManualEdited(info)
 	local zone = info[2]
-	local route = Routes.routekeys[zone][ info[3] ]
+	local route = Routes.routekeys[zone][info[3]]
 	return db.routes[zone][route].editing
 end
 function ConfigHandler.GetRouteName(info)
 	local zone = info[2]
-	return Routes.routekeys[zone][ info[3] ]
+	return Routes.routekeys[zone][info[3]]
 end
 
 do
@@ -1810,33 +1787,34 @@ do
 					desc1 = {
 						type = "description",
 						name = ConfigHandler.GetRouteDesc,
-						order = 0,
+						order = 0
 					},
 					desc2 = {
 						type = "description",
 						name = ConfigHandler.GetDataDesc,
-						order = 10,
+						order = 10
 					},
 					desc3 = {
 						type = "description",
 						name = ConfigHandler.GetClusterDesc,
-						order = 20,
+						order = 20
 					},
 					desc4 = {
 						type = "description",
 						name = ConfigHandler.GetTabooDesc,
-						order = 30,
+						order = 30
 					},
 					delete = {
-						name = L["Delete"], type = "execute",
+						name = L["Delete"],
+						type = "execute",
 						desc = L["Permanently delete a route"],
 						func = "DeleteRoute",
 						confirm = true,
 						confirmText = L["Are you sure you want to delete this route?"],
 						order = 100,
-						disabled = "IsBeingManualEdited",
-					},
-				},
+						disabled = "IsBeingManualEdited"
+					}
+				}
 			},
 			setting_group = {
 				type = "group",
@@ -1847,53 +1825,71 @@ do
 					desc = {
 						type = "description",
 						name = L["These settings control the visibility and look of the drawn route."],
-						order = 0,
+						order = 0
 					},
 					color = {
-						name = L["Line Color"], type = "color",
+						name = L["Line Color"],
+						type = "color",
 						desc = L["Change the line color"],
-						get = "GetColor", set = "SetColor",
+						get = "GetColor",
+						set = "SetColor",
 						order = 100,
-						hasAlpha = true,
+						hasAlpha = true
 					},
 					hidden = {
-						name = L["Hide Route"], type = "toggle",
+						name = L["Hide Route"],
+						type = "toggle",
 						desc = L["Hide the route from being shown on the maps"],
-						get = "GetHidden", set = "SetHidden",
-						order = 200,
+						get = "GetHidden",
+						set = "SetHidden",
+						order = 200
 					},
 					width = {
-						name = L["Width (Map)"], type = "range",
+						name = L["Width (Map)"],
+						type = "range",
 						desc = L["Width of the line in the map"],
-						min = 10, max = 100, step = 1,
-						get = "GetWidth", set = "SetWidth",
-						order = 300,
+						min = 10,
+						max = 100,
+						step = 1,
+						get = "GetWidth",
+						set = "SetWidth",
+						order = 300
 					},
 					width_minimap = {
-						name = L["Width (Minimap)"], type = "range",
+						name = L["Width (Minimap)"],
+						type = "range",
 						desc = L["Width of the line in the Minimap"],
-						min = 10, max = 100, step = 1,
-						get = "GetWidthMinimap", set = "SetWidthMinimap",
-						order = 310,
+						min = 10,
+						max = 100,
+						step = 1,
+						get = "GetWidthMinimap",
+						set = "SetWidthMinimap",
+						order = 310
 					},
 					width_battlemap = {
-						name = L["Width (Zone Map)"], type = "range",
+						name = L["Width (Zone Map)"],
+						type = "range",
 						desc = L["Width of the line in the Zone Map"],
-						min = 10, max = 100, step  = 1,
-						get = "GetWidthBattleMap", set = "SetWidthBattleMap",
-						order = 320,
+						min = 10,
+						max = 100,
+						step = 1,
+						get = "GetWidthBattleMap",
+						set = "SetWidthBattleMap",
+						order = 320
 					},
 					blankline = {
-						name = "", type = "description",
-						order = 325,
+						name = "",
+						type = "description",
+						order = 325
 					},
 					reset_all = {
-						name = L["Reset"], type = "execute",
+						name = L["Reset"],
+						type = "execute",
 						desc = L["Reset the line settings to defaults"],
 						func = "ResetLineSettings",
-						order = 500,
-					},
-				},
+						order = 500
+					}
+				}
 			},
 			optimize_group = {
 				type = "group",
@@ -1904,60 +1900,65 @@ do
 					desc = {
 						type = "description",
 						name = ConfigHandler.GetRouteDesc,
-						order = 0,
+						order = 0
 					},
 					desc2 = {
 						type = "description",
 						name = ConfigHandler.GetShortClusterDesc,
-						order = 1,
+						order = 1
 					},
 					desc3 = {
 						type = "description",
 						name = ConfigHandler.GetRouteClusterRadiusDesc,
 						hidden = "IsNotCluster",
 						disabled = "IsNotCluster",
-						order = 2,
+						order = 2
 					},
 					cluster_header = {
 						type = "header",
 						name = L["Route Clustering"],
-						order = 40,
+						order = 40
 					},
 					desc_cluster = {
-						type  = "description",
-						name  = L["CLUSTER_DESC"],
-						order = 50,
+						type = "description",
+						name = L["CLUSTER_DESC"],
+						order = 50
 					},
 					cluster_dist = {
-						name = L["Cluster Radius"], type = "range",
+						name = L["Cluster Radius"],
+						type = "range",
 						desc = L["CLUSTER_RADIUS_DESC"],
-						min = 10, max = 200, step = 1,
+						min = 10,
+						max = 200,
+						step = 1,
 						get = "GetDefaultClusterDist",
 						set = "SetDefaultClusterDist",
 						hidden = "IsCluster",
 						disabled = "IsCluster",
-						order = 60,
+						order = 60
 					},
 					cluster = {
-						name = L["Cluster"], type = "execute",
+						name = L["Cluster"],
+						type = "execute",
 						desc = L["Cluster this route"],
 						func = "ClusterRoute",
 						hidden = "IsCluster",
 						disabled = "IsCluster",
-						order = 70,
+						order = 70
 					},
 					uncluster = {
-						name = L["Uncluster"], type = "execute",
+						name = L["Uncluster"],
+						type = "execute",
 						desc = L["Uncluster this route"],
 						func = "UnClusterRoute",
 						hidden = "IsNotCluster",
 						disabled = "IsNotCluster",
-						order = 80,
+						order = 80
 					},
 					optimize_header = {
 						type = "header",
 						name = L["Route Optimizing"],
-						order = 100,
+						order = 100
 					},
 					two_point_five_group = {
 						type = "group",
@@ -1966,17 +1967,20 @@ do
 						inline = true,
 						args = {
 							two_point_five_opt_disc = {
-								name = L["ExtraOptDesc"], type = "description",
-								order = 0,
+								name = L["ExtraOptDesc"],
+								type = "description",
+								order = 0
 							},
 							two_point_five_opt = {
-								name = L["Extra optimization"], type = "toggle",
+								name = L["Extra optimization"],
+								type = "toggle",
 								desc = L["ExtraOptDesc"],
-								get = "GetTwoPointFiveOpt", set = "SetTwoPointFiveOpt",
+								get = "GetTwoPointFiveOpt",
+								set = "SetTwoPointFiveOpt",
 								disabled = false, -- to avoid inheriting from parent, so we don't have to use an arg= field
-								order = 100,
-							},
-						},
+								order = 100
+							}
+						}
 					},
 					foreground_group = {
 						type = "group",
@@ -1985,17 +1989,18 @@ do
 						inline = true,
 						args = {
 							foreground_disc = {
-								type  = "description",
-								name  = L["Foreground Disclaimer"],
-								order = 0,
+								type = "description",
+								name = L["Foreground Disclaimer"],
+								order = 0
 							},
 							foreground = {
-								name = L["Foreground"], type = "execute",
+								name = L["Foreground"],
+								type = "execute",
 								desc = L["Foreground Disclaimer"],
 								func = "DoForeground",
-								order = 100,
-							},
-						},
+								order = 100
+							}
+						}
 					},
 					background_group = {
 						type = "group",
@@ -2004,19 +2009,20 @@ do
 						inline = true,
 						args = {
 							background_disc = {
-								type  = "description",
-								name  = L["Background Disclaimer"],
-								order = 0,
+								type = "description",
+								name = L["Background Disclaimer"],
+								order = 0
 							},
 							background = {
-								name = L["Background"], type = "execute",
+								name = L["Background"],
+								type = "execute",
 								desc = L["Background Disclaimer"],
 								func = "DoBackground",
-								order = 100,
-							},
-						},
-					},
-				},
+								order = 100
+							}
+						}
+					}
+				}
 			},
 			taboo_group = {
 				type = "group",
@@ -2025,9 +2031,9 @@ do
 				disabled = "IsBeingManualEdited",
 				args = {
 					desc = {
-						type  = "description",
-						name  = L["TABOO_DESC2"],
-						order = 0,
+						type = "description",
+						name = L["TABOO_DESC2"],
+						order = 0
 					},
 					taboos = {
 						name = L["Select taboo regions to apply:"],
@@ -2035,12 +2041,12 @@ do
 						order = 100,
 						values = "GetTabooRegions",
 						get = "GetTabooRegionStatus",
-						set = "SetTabooRegionStatus",
-					},
-				},
-			},
-			--edit_group = Routes:GetAceOptRouteEditTable(),
-		},
+						set = "SetTabooRegionStatus"
+					}
+				}
+			}
+			-- edit_group = Routes:GetAceOptRouteEditTable(),
+		}
 	}
 	function Routes:GetAceOptRouteTable()
 		routeTable.args.edit_group = Routes:GetAceOptRouteEditTable()
@@ -2048,12 +2054,12 @@ do
 	end
 end
 
-
 local source_data = {}
 options.args.routes_group.args.desc = {
 	type = "description",
-	name = L["When the following data sources add or delete node data, update my routes automatically by inserting or removing the same node in the relevant routes."]..L[" Gatherer/HandyNotes currently does not support callbacks, so this is impossible for Gatherer/HandyNotes."],
-	order = 0,
+	name = L["When the following data sources add or delete node data, update my routes automatically by inserting or removing the same node in the relevant routes."]
+		.. L[" Gatherer/HandyNotes currently does not support callbacks, so this is impossible for Gatherer/HandyNotes."],
+	order = 0
 }
 options.args.routes_group.args.callbacks = {
 	type = "multiselect",
@@ -2078,7 +2084,7 @@ options.args.routes_group.args.callbacks = {
 			Routes.plugins[k].RemoveCallbacks()
 		end
 	end,
-	tristate = true,
+	tristate = true
 }
 
 -- AceOpt config table for route creation
@@ -2096,7 +2102,7 @@ do
 	local function deep_copy_table(a, b)
 		for k, v in pairs(b) do
 			if type(v) == "table" then
-				--a[k] = {} -- no need this, AceDB defaults should handle it
+				-- a[k] = {} -- no need this, AceDB defaults should handle it
 				deep_copy_table(a[k], v)
 			else
 				a[k] = v
@@ -2111,25 +2117,17 @@ do
 		-- reuse table
 		wipe(create_data)
 		-- extract data from plugin
-		if Routes.plugins[info.arg].IsActive() then
-			Routes.plugins[info.arg].Summarize(create_data, create_zone)
-		end
+		if Routes.plugins[info.arg].IsActive() then Routes.plugins[info.arg].Summarize(create_data, create_zone) end
 		-- found no data - insert dummy message
-		if not next(create_data) then
-			create_data[ db.defaults.fake_data ..";;;" ] = L["No data found"]
-		end
+		if not next(create_data) then create_data[db.defaults.fake_data .. ";;;"] = L["No data found"] end
 		last_zone[info.arg] = create_zone
 		-- Remove invalid entries due to updated data so we don't pairs over it during route creation
-		if create_choices[create_zone] then
-			for k in pairs(create_choices[create_zone]) do
-				if not create_data[k] then create_choices[create_zone][k] = nil end
-			end
-		end
+		if create_choices[create_zone] then for k in pairs(create_choices[create_zone]) do if not create_data[k] then create_choices[create_zone][k] = nil end end end
 		return create_data
 	end
 
 	local function get_source_value(info, key)
-		--Routes:Print(("Getting choice for: %s"):format(key or "nil"));
+		-- Routes:Print(("Getting choice for: %s"):format(key or "nil"));
 		if not create_zone then return end
 		if key == db.defaults.fake_data then return end
 		if not create_choices[create_zone] then create_choices[create_zone] = {} end
@@ -2141,7 +2139,7 @@ do
 		if key == db.defaults.fake_data then return end
 		if not create_choices[create_zone] then create_choices[create_zone] = {} end
 		create_choices[create_zone][key] = value
-		--Routes:Print(("Setting choice: %s to %s"):format(key or "nil", value and "true" or "false"));
+		-- Routes:Print(("Setting choice: %s to %s"):format(key or "nil", value and "true" or "false"));
 	end
 
 	function Routes:SetupSourcesOptTables()
@@ -2156,7 +2154,8 @@ do
 				order = order + 1
 				create_data[addonkey] = {}
 				options.args.add_group.args[addonkey] = {
-					name = addon..L[" Data"], type = "multiselect",
+					name = addon .. L[" Data"],
+					type = "multiselect",
 					order = order,
 					arg = addon,
 					values = get_source_values,
@@ -2164,7 +2163,7 @@ do
 					set = set_source_value,
 					width = "full",
 					disabled = not plugin_table.IsActive(),
-					guiHidden = not plugin_table.IsActive(),
+					guiHidden = not plugin_table.IsActive()
 				}
 			end
 		end
@@ -2176,47 +2175,43 @@ do
 			name = L["Name of Route"],
 			desc = L["Name of the route to add"],
 			validate = function(info, name)
-				if name == "" or strtrim(name) == "" then
-					return L["No name given for new route"]
-				end
+				if name == "" or strtrim(name) == "" then return L["No name given for new route"] end
 				return true
 			end,
 			get = function() return create_name end,
 			set = function(info, v) create_name = strtrim(v) end,
-			order = 100,
+			order = 100
 		},
 		zone_choice = {
-			name = L["Select Zone"], type = "select",
+			name = L["Select Zone"],
+			type = "select",
 			desc = L["Zone to create route in"],
 			order = 150,
 			values = function()
-				if not next(create_zones) then
-					for k, v in pairs(Routes.zoneNames) do
-						create_zones[v] = v
-					end
-				end
+				if not next(create_zones) then for k, v in pairs(Routes.zoneNames) do create_zones[v] = v end end
 				return create_zones
 			end,
 			get = function()
 				-- Use currently viewed map on first view.
-				create_zone = create_zone or Routes.zoneNames[GetCurrentMapContinent()*100 + GetCurrentMapZone()]
+				create_zone = create_zone or Routes.zoneNames[GetCurrentMapContinent() * 100 + GetCurrentMapZone()]
 				return create_zone
 			end,
 			set = function(info, key) create_zone = key end,
-			style = "radio",
+			style = "radio"
 		},
 		header_bare = {
 			type = "header",
 			name = L["Create Bare Route"],
-			order = 200,
+			order = 200
 		},
 		info_bare = {
 			type = "description",
 			name = L["CREATE_BARE_ROUTE_DESC"],
-			order = 201,
+			order = 201
 		},
 		add_route_bare = {
-			name = L["Create Bare Route"], type = "execute",
+			name = L["Create Bare Route"],
+			type = "execute",
 			desc = L["CREATE_BARE_ROUTE_DESC"],
 			order = 202,
 			func = function()
@@ -2225,7 +2220,11 @@ do
 					Routes:Print(L["No name given for new route"])
 					return
 				end
-				local new_route = { route = {71117111, 12357823, 11171123}, selection = {}, db_type = {} }
+				local new_route = {
+					route = {71117111, 12357823, 11171123},
+					selection = {},
+					db_type = {}
+				}
 
 				-- Perform a deep copy instead so that db defaults apply
 				local mapfile = Routes.zoneData[create_zone][4]
@@ -2243,8 +2242,8 @@ do
 						name = create_zone,
 						desc = L["Routes in %s"]:format(create_zone),
 						args = {
-							desc = route_zone_args_desc_table,
-						},
+							desc = route_zone_args_desc_table
+						}
 					}
 					Routes.routekeys[mapfile] = {}
 				end
@@ -2254,9 +2253,7 @@ do
 
 				-- Draw it
 				local AutoShow = Routes:GetModule("AutoShow", true)
-				if AutoShow and db.defaults.use_auto_showhide then
-					AutoShow:ApplyVisibility()
-				end
+				if AutoShow and db.defaults.use_auto_showhide then AutoShow:ApplyVisibility() end
 				Routes:DrawWorldmapLines()
 				Routes:DrawMinimapLines(true)
 
@@ -2264,31 +2261,26 @@ do
 				create_name = ""
 				create_zone = nil
 			end,
-			disabled = function()
-				return not create_name or strtrim(create_name) == ""
-			end,
+			disabled = function() return not create_name or strtrim(create_name) == "" end,
 			confirm = function()
-				if #db.routes[ Routes.zoneData[create_zone][4] ][create_name].route > 0 then
-					return true
-				end
+				if #db.routes[Routes.zoneData[create_zone][4]][create_name].route > 0 then return true end
 				return false
 			end,
-			confirmText = L["A route with that name already exists. Overwrite?"],
+			confirmText = L["A route with that name already exists. Overwrite?"]
 		},
 		header_normal = {
 			type = "header",
 			name = L["Create Route from Data Sources"],
-			order = 225,
+			order = 225
 		},
 		source_choices = {
-			name = L["Select sources of data"], type = "multiselect",
+			name = L["Select sources of data"],
+			type = "multiselect",
 			order = 250,
 			values = source_data,
 			get = function(info, k)
 				if Routes.plugins[k].IsActive() then
-					if source_data_choice[k] == nil then
-						source_data_choice[k] = true
-					end
+					if source_data_choice[k] == nil then source_data_choice[k] = true end
 					return source_data_choice[k]
 				else
 					return nil
@@ -2302,10 +2294,11 @@ do
 				options.args.add_group.args[k].disabled = not v
 				options.args.add_group.args[k].guiHidden = not v
 			end,
-			tristate = true,
+			tristate = true
 		},
 		add_route = {
-			name = L["Create Route"], type = "execute",
+			name = L["Create Route"],
+			type = "execute",
 			desc = L["Create Route"],
 			order = 400,
 			func = function()
@@ -2315,7 +2308,11 @@ do
 					return
 				end
 				-- the real 'action', we use a temporary table in case of data corruption and only commit this to the db if successful
-				local new_route = { route = {}, selection = {}, db_type = {} }
+				local new_route = {
+					route = {},
+					selection = {},
+					db_type = {}
+				}
 				-- if for every selected nodetype on this map
 				if type(create_choices[create_zone]) == "table" then
 					for data_string, wanted in pairs(create_choices[create_zone]) do
@@ -2323,7 +2320,7 @@ do
 						local addonkey = db_src:gsub("%s", "_")
 						-- if we want em
 						if (wanted and source_data_choice[addonkey]) then
-							--Routes:Print(("found %s %s %s %s"):format( db_src,db_type,node_type,amount ))
+							-- Routes:Print(("found %s %s %s %s"):format( db_src,db_type,node_type,amount ))
 							if db_src ~= db.defaults.fake_data then -- ignore any fake data
 								-- extract data from plugin
 								local plugin = Routes.plugins[db_src]
@@ -2358,8 +2355,8 @@ do
 						name = create_zone,
 						desc = L["Routes in %s"]:format(create_zone),
 						args = {
-							desc = route_zone_args_desc_table,
-						},
+							desc = route_zone_args_desc_table
+						}
 					}
 					Routes.routekeys[mapfile] = {}
 				end
@@ -2369,9 +2366,7 @@ do
 
 				-- Draw it
 				local AutoShow = Routes:GetModule("AutoShow", true)
-				if AutoShow and db.defaults.use_auto_showhide then
-					AutoShow:ApplyVisibility()
-				end
+				if AutoShow and db.defaults.use_auto_showhide then AutoShow:ApplyVisibility() end
 				Routes:DrawWorldmapLines()
 				Routes:DrawMinimapLines(true)
 
@@ -2379,26 +2374,19 @@ do
 				create_name = ""
 				create_zone = nil
 			end,
-			disabled = function()
-				return not create_name or strtrim(create_name) == ""
-			end,
+			disabled = function() return not create_name or strtrim(create_name) == "" end,
 			confirm = function()
-				if #db.routes[ Routes.zoneData[create_zone][4] ][create_name].route > 0 then
-					return true
-				end
+				if #db.routes[Routes.zoneData[create_zone][4]][create_name].route > 0 then return true end
 				return false
 			end,
-			confirmText = L["A route with that name already exists. Overwrite?"],
-		},
+			confirmText = L["A route with that name already exists. Overwrite?"]
+		}
 	}
 
 	-- Add another 'Create button'
 	options.args.add_group.args.add_route_copy = {}
-	for k,v in pairs(options.args.add_group.args.add_route) do
-		options.args.add_group.args.add_route_copy[k] = v
-	end
-	options.args.add_group.args.add_route_copy.order
-		= options.args.add_group.args.source_choices.order + 1
+	for k, v in pairs(options.args.add_group.args.add_route) do options.args.add_group.args.add_route_copy[k] = v end
+	options.args.add_group.args.add_route_copy.order = options.args.add_group.args.source_choices.order + 1
 end
 
 ------------------------------------------------------------------------------------------------------
@@ -2411,10 +2399,10 @@ do
 	RoutesTabooFrame:EnableMouse(false)
 
 	local intersection = {}
-	local pool = setmetatable({}, {__mode="kv"})
-	local function SortIntersection(a, b)
-		return a.x < b.x
-	end
+	local pool = setmetatable({}, {
+		__mode = "kv"
+	})
+	local function SortIntersection(a, b) return a.x < b.x end
 
 	-- This function takes a taboo (a route basically), and draws it on screen and shades the inside
 	function Routes:DrawTaboo(route_data, width, color)
@@ -2426,14 +2414,14 @@ do
 		do
 			local last_point
 			local sx, sy
-			last_point = route_data.route[ #route_data.route ]
+			last_point = route_data.route[#route_data.route]
 			sx, sy = floor(last_point / 10000) / 10000, (last_point % 10000) / 10000
 			sy = (1 - sy)
 			for i = 1, #route_data.route do
 				local point = route_data.route[i]
 				local ex, ey = floor(point / 10000) / 10000, (point % 10000) / 10000
 				ey = (1 - ey)
-				G:DrawLine(RoutesTabooFrame, sx*fw, sy*fh, ex*fw, ey*fh, width, color , "OVERLAY")
+				G:DrawLine(RoutesTabooFrame, sx * fw, sy * fh, ex * fw, ey * fh, width, color, "OVERLAY")
 				sx, sy = ex, ey
 				last_point = point
 			end
@@ -2443,15 +2431,13 @@ do
 
 		-- The shade-lines get half-alpha and 66% width
 		color[4] = color[4] / 2
-		width = 2/3 * width
+		width = 2 / 3 * width
 		for z = 0, 1 do -- loop twice, once for upper half, once for lower half
 			for k = 0, 1, 0.01 do
-				for i = 1, #intersection do
-					pool[tremove(intersection)] = true
-				end
+				for i = 1, #intersection do pool[tremove(intersection)] = true end
 				local last_point
 				local sx, sy
-				last_point = route_data.route[ #route_data.route ]
+				last_point = route_data.route[#route_data.route]
 				sx, sy = floor(last_point / 10000) / 10000, (last_point % 10000) / 10000
 				for i = 1, #route_data.route do
 					local point = route_data.route[i]
@@ -2466,21 +2452,21 @@ do
 						pool[vector] = nil
 						vector.x, vector.y = ex, ey
 						tinsert(intersection, vector)]]
-					elseif ex+ey-sx-sy ~= 0 then -- 0 indicates a parallel line
+					elseif ex + ey - sx - sy ~= 0 then -- 0 indicates a parallel line
 						local u, t
 						if z == 0 and k ~= 0 then
-							u = (k - sx - sy)/(ex+ey-sx-sy)
-							t = (sx + (ex-sx)*u)/k
+							u = (k - sx - sy) / (ex + ey - sx - sy)
+							t = (sx + (ex - sx) * u) / k
 						elseif z == 1 and k ~= 1 then
-							u = (1 - sx - sy + k)/(ex+ey-sx-sy)
-							t = (sx + (ex-sx)*u - k)/(1-k)
+							u = (1 - sx - sy + k) / (ex + ey - sx - sy)
+							t = (sx + (ex - sx) * u - k) / (1 - k)
 						else
 							u, t = -1, -1 -- invalid
 						end
 						if t >= 0 and t <= 1 and u >= 0 and u <= 1 then
 							local vector = next(pool) or {}
 							pool[vector] = nil
-							vector.x, vector.y = sx + (ex-sx)*u, sy + (ey-sy)*u
+							vector.x, vector.y = sx + (ex - sx) * u, sy + (ey - sy) * u
 							tinsert(intersection, vector)
 						end
 					end
@@ -2494,7 +2480,7 @@ do
 					end
 				end]]
 				for j = 1, #intersection - (#intersection % 2), 2 do -- this loop draws the pairs of intersections
-					G:DrawLine(RoutesTabooFrame, intersection[j].x*fw, (1-intersection[j].y)*fh, intersection[j+1].x*fw, (1-intersection[j+1].y)*fh, width, color , "OVERLAY")
+					G:DrawLine(RoutesTabooFrame, intersection[j].x * fw, (1 - intersection[j].y) * fh, intersection[j + 1].x * fw, (1 - intersection[j + 1].y) * fh, width, color, "OVERLAY")
 				end
 			end
 		end
@@ -2506,14 +2492,12 @@ do
 	local taboo_edit_list = {}
 	function Routes:DrawTaboos()
 		G:HideLines(RoutesTabooFrame)
-		for taboo_orig, taboo_copy in pairs(taboo_edit_list) do
-			Routes:DrawTaboo(taboo_copy)
-		end
+		for taboo_orig, taboo_copy in pairs(taboo_edit_list) do Routes:DrawTaboo(taboo_copy) end
 	end
 
 	-- Upvalues used for our taboo node functions
 	local taboo_cache = {}
-	local TEXTURE, DATA, COORD, CURRENT, REAL, X, Y  = 1, 2, 3, 4, 5, 6, 7
+	local TEXTURE, DATA, COORD, CURRENT, REAL, X, Y = 1, 2, 3, 4, 5, 6, 7
 	local GetOrCreateTabooNode
 
 	-- Define our functions for a node pin
@@ -2529,7 +2513,7 @@ do
 		self.elapsed = nil
 		self:SetParent(RoutesTabooFrame)
 		self:ClearAllPoints()
-		self:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", self[X]*RoutesTabooFrame:GetWidth(), -self[Y]*RoutesTabooFrame:GetHeight())
+		self:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", self[X] * RoutesTabooFrame:GetWidth(), -self[Y] * RoutesTabooFrame:GetHeight())
 	end
 	function NodeHelper:OnUpdate(elapsed)
 		self.elapsed = self.elapsed + elapsed
@@ -2549,7 +2533,7 @@ do
 		if y < 0.0001 then y = 0.0001 end
 		if y > 0.999 then y = 0.999 end -- we can't have y == 1 because of coord storage format
 
-		local new_id = Routes:getID(x,y)
+		local new_id = Routes:getID(x, y)
 		if id == new_id then return end -- position didn't change, no updates
 		x, y = Routes:getXY(new_id)
 
@@ -2559,22 +2543,22 @@ do
 		self[COORD], self[X], self[Y] = new_id, x, y
 
 		-- Relocate the before helper pin
-		local nodenum = current == 1 and #self[DATA].route or current-1
+		local nodenum = current == 1 and #self[DATA].route or current - 1
 		local node = self[DATA].fakenodes[nodenum]
-		local x2, y2 = Routes:getXY( self[DATA].route[nodenum] )
-		local new_id = Routes:getID( (x+x2)/2, (y+y2)/2 )
+		local x2, y2 = Routes:getXY(self[DATA].route[nodenum])
+		local new_id = Routes:getID((x + x2) / 2, (y + y2) / 2)
 		x2, y2 = Routes:getXY(new_id)
 		node[COORD], node[X], node[Y] = new_id, x2, y2
-		node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x2*pw, -y2*ph)
+		node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x2 * pw, -y2 * ph)
 
 		-- Relocate the after helper pin
-		nodenum = current == #self[DATA].route and 1 or current+1
+		nodenum = current == #self[DATA].route and 1 or current + 1
 		node = self[DATA].fakenodes[current]
-		x2, y2 = Routes:getXY( self[DATA].route[nodenum] )
-		new_id = Routes:getID( (x+x2)/2, (y+y2)/2 )
+		x2, y2 = Routes:getXY(self[DATA].route[nodenum])
+		new_id = Routes:getID((x + x2) / 2, (y + y2) / 2)
 		x2, y2 = Routes:getXY(new_id)
 		node[COORD], node[X], node[Y] = new_id, x2, y2
-		node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x2*pw, -y2*ph)
+		node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x2 * pw, -y2 * ph)
 
 		-- redraw
 		Routes:DrawTaboos()
@@ -2586,25 +2570,25 @@ do
 			self:SetWidth(16)
 			self:SetHeight(16)
 			self:SetAlpha(1)
-			local current = self[CURRENT]+1
+			local current = self[CURRENT] + 1
 			for i = current, #self[DATA].route do
-				self[DATA].nodes[i][CURRENT] = i+1
-				self[DATA].fakenodes[i][CURRENT] = i+1
+				self[DATA].nodes[i][CURRENT] = i + 1
+				self[DATA].fakenodes[i][CURRENT] = i + 1
 			end
 			self[CURRENT] = current
 			tinsert(self[DATA].route, current, self[COORD])
 			tinsert(self[DATA].nodes, current, self)
-			tremove(self[DATA].fakenodes, current-1)
+			tremove(self[DATA].fakenodes, current - 1)
 			local x, y = Routes:getXY(self[COORD])
 			local w, h = RoutesTabooFrame:GetWidth(), RoutesTabooFrame:GetHeight()
 
 			-- Now create the before helper pin
-			local nodenum = current == 1 and #self[DATA].route or current-1
-			local x2, y2 = Routes:getXY( self[DATA].route[nodenum] )
-			local new_id = Routes:getID( (x+x2)/2, (y+y2)/2 )
+			local nodenum = current == 1 and #self[DATA].route or current - 1
+			local x2, y2 = Routes:getXY(self[DATA].route[nodenum])
+			local new_id = Routes:getID((x + x2) / 2, (y + y2) / 2)
 			local node = GetOrCreateTabooNode(self[DATA], new_id)
 			x2, y2 = Routes:getXY(new_id)
-			node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x2*w, -y2*h)
+			node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x2 * w, -y2 * h)
 			node:SetWidth(10)
 			node:SetHeight(10)
 			node:SetAlpha(0.75)
@@ -2613,12 +2597,12 @@ do
 			tinsert(self[DATA].fakenodes, nodenum, node)
 
 			-- Create the after helper pin
-			nodenum = current == #self[DATA].route and 1 or current+1
-			x2, y2 = Routes:getXY( self[DATA].route[nodenum] )
-			new_id = Routes:getID( (x+x2)/2, (y+y2)/2 )
+			nodenum = current == #self[DATA].route and 1 or current + 1
+			x2, y2 = Routes:getXY(self[DATA].route[nodenum])
+			new_id = Routes:getID((x + x2) / 2, (y + y2) / 2)
 			node = GetOrCreateTabooNode(self[DATA], new_id)
 			x2, y2 = Routes:getXY(new_id)
-			node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x2*w, -y2*h)
+			node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x2 * w, -y2 * h)
 			node:SetWidth(10)
 			node:SetHeight(10)
 			node:SetAlpha(0.75)
@@ -2629,9 +2613,9 @@ do
 		elseif button == "RightButton" and self[REAL] and #self[DATA].route > 3 then
 			-- Delete node if we have more than 3 nodes
 			local current = self[CURRENT]
-			for i = current+1, #self[DATA].route do
-				self[DATA].nodes[i][CURRENT] = i-1
-				self[DATA].fakenodes[i][CURRENT] = i-1
+			for i = current + 1, #self[DATA].route do
+				self[DATA].nodes[i][CURRENT] = i - 1
+				self[DATA].fakenodes[i][CURRENT] = i - 1
 			end
 			tremove(self[DATA].route, current)
 			local a = tremove(self[DATA].nodes, current)
@@ -2639,15 +2623,15 @@ do
 
 			-- Relocate the before helper pin
 			local w, h = RoutesTabooFrame:GetWidth(), RoutesTabooFrame:GetHeight()
-			local nodenum = current == 1 and #self[DATA].route or current-1
+			local nodenum = current == 1 and #self[DATA].route or current - 1
 			local nodenum2 = current > #self[DATA].route and 1 or current
 			local node = self[DATA].fakenodes[nodenum]
-			local x, y = Routes:getXY( self[DATA].route[nodenum] )
-			local x2, y2 = Routes:getXY( self[DATA].route[nodenum2] )
-			local new_id = Routes:getID( (x+x2)/2, (y+y2)/2 )
+			local x, y = Routes:getXY(self[DATA].route[nodenum])
+			local x2, y2 = Routes:getXY(self[DATA].route[nodenum2])
+			local new_id = Routes:getID((x + x2) / 2, (y + y2) / 2)
 			x2, y2 = Routes:getXY(new_id)
 			node[COORD], node[X], node[Y] = new_id, x2, y2
-			node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x2*w, -y2*h)
+			node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x2 * w, -y2 * h)
 
 			-- Recycle ourselves
 			a:Hide()
@@ -2664,17 +2648,17 @@ do
 		end
 	end
 
-	GetOrCreateTabooNode = function( route_data, coord )
-		node = next( taboo_cache )
+	GetOrCreateTabooNode = function(route_data, coord)
+		node = next(taboo_cache)
 		if node then
-			taboo_cache[ node ] = nil
+			taboo_cache[node] = nil
 		else
 			-- Create new node
-			node = CreateFrame( "Button", nil, RoutesTabooFrame )
-			node:SetFrameLevel( RoutesTabooFrame:GetFrameLevel() + 6 ) -- we need to be above others (GatherMate nodes are @ 5)
+			node = CreateFrame("Button", nil, RoutesTabooFrame)
+			node:SetFrameLevel(RoutesTabooFrame:GetFrameLevel() + 6) -- we need to be above others (GatherMate nodes are @ 5)
 
 			-- set it up
-			local texture = node:CreateTexture( nil, "OVERLAY" )
+			local texture = node:CreateTexture(nil, "OVERLAY")
 			texture:SetTexture("Interface\\WorldMap\\WorldMapPartyIcon")
 			texture:SetAllPoints(node)
 			node[TEXTURE] = texture
@@ -2686,7 +2670,7 @@ do
 		end
 
 		-- store data
-		node[X], node[Y] = Routes:getXY( coord )
+		node[X], node[Y] = Routes:getXY(coord)
 		node[COORD] = coord
 		node[DATA] = route_data
 
@@ -2719,34 +2703,36 @@ do
 		-- make a copy of the taboo for editing
 		local taboo_data
 		if info[1] == "routes_group" then
-			local routeName = Routes.routekeys[zone][ info[3] ]
+			local routeName = Routes.routekeys[zone][info[3]]
 			taboo_data = db.routes[zone][routeName]
 		else
-			local tabooName = Routes.tabookeys[zone][ info[3] ]
+			local tabooName = Routes.tabookeys[zone][info[3]]
 			taboo_data = db.taboo[zone][tabooName]
 		end
-		local copy_of_taboo_data = {route = {}, nodes = {}, fakenodes = {}}
+		local copy_of_taboo_data = {
+			route = {},
+			nodes = {},
+			fakenodes = {}
+		}
 		if info[1] == "routes_group" then
 			local is_running, route_table = Routes.TSP:IsTSPRunning()
 			if is_running and route_table == taboo_data.route then return end
 			if ConfigHandler:IsCluster(info) then return end
 			copy_of_taboo_data.isroute = true
 			taboo_data.editing = true
-			throttleFrame:Show()  -- To remove the route from the map
+			throttleFrame:Show() -- To remove the route from the map
 		end
-		for i = 1, #taboo_data.route do
-			copy_of_taboo_data.route[i] = taboo_data.route[i]
-		end
+		for i = 1, #taboo_data.route do copy_of_taboo_data.route[i] = taboo_data.route[i] end
 		taboo_edit_list[taboo_data] = copy_of_taboo_data
 
 		local fh, fw = RoutesTabooFrame:GetHeight(), RoutesTabooFrame:GetWidth()
 
 		local route = copy_of_taboo_data.route
 		-- Pin the real nodes
-		for i=1, #route do
+		for i = 1, #route do
 			local node = GetOrCreateTabooNode(copy_of_taboo_data, route[i])
 			local x, y = node[X], node[Y]
-			node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x*fw, -y*fh)
+			node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x * fw, -y * fh)
 			node[CURRENT] = i
 			node[REAL] = true
 			copy_of_taboo_data.nodes[i] = node
@@ -2755,13 +2741,13 @@ do
 			node:SetAlpha(1)
 		end
 		-- Pin the helper nodes
-		for i=1, #route do
+		for i = 1, #route do
 			local beforeX, beforeY = Routes:getXY(route[i])
-			local afterX, afterY = Routes:getXY(route[i == #route and 1 or i+1])
-			local new_id = Routes:getID( (beforeX+afterX)/2, (beforeY+afterY)/2 )
+			local afterX, afterY = Routes:getXY(route[i == #route and 1 or i + 1])
+			local new_id = Routes:getID((beforeX + afterX) / 2, (beforeY + afterY) / 2)
 			local node = GetOrCreateTabooNode(copy_of_taboo_data, new_id)
 			local x, y = Routes:getXY(new_id)
-			node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x*fw, -y*fh)
+			node:SetPoint("CENTER", RoutesTabooFrame, "TOPLEFT", x * fw, -y * fh)
 			node[CURRENT] = i
 			node[REAL] = false
 			copy_of_taboo_data.fakenodes[i] = node
@@ -2771,22 +2757,18 @@ do
 		end
 		Routes:DrawTaboos()
 		-- open the WorldMapFlame on the right zone
-		local zone_id = Routes.zoneData[ Routes.zoneMapFile[zone] ][3]
+		local zone_id = Routes.zoneData[Routes.zoneMapFile[zone]][3]
 		WorldMapFrame:Show()
-		SetMapZoom( floor( zone_id / 100 ), zone_id % 100 )
+		SetMapZoom(floor(zone_id / 100), zone_id % 100)
 	end
 	function TabooHandler:SaveEditTaboo(info)
 		local zone = info[2]
 		if info[1] == "routes_group" then
-			local route = Routes.routekeys[zone][ info[3] ]
+			local route = Routes.routekeys[zone][info[3]]
 			local route_data = db.routes[zone][route]
 			local copy_of_taboo = self:CancelEditTaboo(info)
-			for i = 1, #copy_of_taboo.route do
-				route_data.route[i] = copy_of_taboo.route[i]
-			end
-			for i = #copy_of_taboo.route + 1, #route_data.route do
-				route_data.route[i] = nil
-			end
+			for i = 1, #copy_of_taboo.route do route_data.route[i] = copy_of_taboo.route[i] end
+			for i = #copy_of_taboo.route + 1, #route_data.route do route_data.route[i] = nil end
 			for tabooname, used in pairs(route_data.taboos) do
 				if used then
 					local taboo_data = db.taboo[zone][tabooname]
@@ -2794,7 +2776,7 @@ do
 				end
 			end
 		else
-			local taboo = Routes.tabookeys[zone][ info[3] ]
+			local taboo = Routes.tabookeys[zone][info[3]]
 			local taboo_data = db.taboo[zone][taboo]
 			local copy_of_taboo = self:CancelEditTaboo(info)
 			taboo_data.route = copy_of_taboo.route
@@ -2809,22 +2791,22 @@ do
 				end
 			end
 		end
-		throttleFrame:Show()  -- Redraw the changes
+		throttleFrame:Show() -- Redraw the changes
 	end
 	function TabooHandler:CancelEditTaboo(info)
 		local zone = info[2]
 		local taboo
 		if info[1] == "routes_group" then
-			local routeName = Routes.routekeys[zone][ info[3] ]
+			local routeName = Routes.routekeys[zone][info[3]]
 			taboo = db.routes[zone][routeName]
 		else
-			local tabooName = Routes.tabookeys[zone][ info[3] ]
+			local tabooName = Routes.tabookeys[zone][info[3]]
 			taboo = db.taboo[zone][tabooName]
 		end
 
 		if info[1] == "routes_group" then
 			taboo.editing = nil
-			throttleFrame:Show()  -- Redraw the route
+			throttleFrame:Show() -- Redraw the route
 		end
 		local copy_of_taboo = taboo_edit_list[taboo]
 		taboo_edit_list[taboo] = nil
@@ -2855,7 +2837,7 @@ do
 		local tabookey = info[3]
 		local taboo = Routes.tabookeys[zone][tabookey]
 		db.taboo[zone][taboo] = nil
-		--local tabookey = taboo:gsub("%s", "\255") -- can't have spaces in the key
+		-- local tabookey = taboo:gsub("%s", "\255") -- can't have spaces in the key
 		options.args.taboo_group.args[zone].args[tabookey] = nil -- delete taboo from aceopt
 		Routes.tabookeys[zone][tabookey] = nil
 		if next(db.taboo[zone]) == nil then
@@ -2878,21 +2860,19 @@ do
 		local zone = info[2]
 		local taboo
 		if info[1] == "routes_group" then
-			local routeName = Routes.routekeys[zone][ info[3] ]
+			local routeName = Routes.routekeys[zone][info[3]]
 			taboo = db.routes[zone][routeName]
 		else
-			local tabooName = Routes.tabookeys[zone][ info[3] ]
+			local tabooName = Routes.tabookeys[zone][info[3]]
 			taboo = db.taboo[zone][tabooName]
 		end
 		if taboo_edit_list[taboo] then return true end
 		return false
 	end
-	function TabooHandler:IsNotBeingEdited(info)
-		return not self:IsBeingEdited(info)
-	end
+	function TabooHandler:IsNotBeingEdited(info) return not self:IsBeingEdited(info) end
 	function TabooHandler.GetTabooName(info)
 		local zone = info[2]
-		return Routes.tabookeys[zone][ info[3] ]
+		return Routes.tabookeys[zone][info[3]]
 	end
 
 	do
@@ -2905,7 +2885,7 @@ do
 				desc = {
 					type = "description",
 					order = 0,
-					name = L["TABOO_EDIT_DESC"],
+					name = L["TABOO_EDIT_DESC"]
 				},
 				edit_taboo = {
 					type = "execute",
@@ -2913,7 +2893,7 @@ do
 					desc = L["Edit this taboo region on the world map"],
 					order = 1,
 					func = "EditTaboo",
-					disabled = "IsBeingEdited",
+					disabled = "IsBeingEdited"
 				},
 				save_edit_taboo = {
 					type = "execute",
@@ -2921,7 +2901,7 @@ do
 					desc = L["Stop editing this taboo region on the world map and save the edits"],
 					order = 2,
 					func = "SaveEditTaboo",
-					disabled = "IsNotBeingEdited",
+					disabled = "IsNotBeingEdited"
 				},
 				cancel_edit_taboo = {
 					type = "execute",
@@ -2929,7 +2909,7 @@ do
 					desc = L["Stop editing this taboo region on the world map and abandon changes made"],
 					order = 3,
 					func = "CancelEditTaboo",
-					disabled = "IsNotBeingEdited",
+					disabled = "IsNotBeingEdited"
 				},
 				delete_taboo = {
 					type = "execute",
@@ -2939,13 +2919,11 @@ do
 					func = "DeleteTaboo",
 					disabled = "IsBeingEdited",
 					confirm = true,
-					confirmText = L["Are you sure you want to delete this taboo? This action will also remove the taboo from all routes that use it."],
-				},
-			},
+					confirmText = L["Are you sure you want to delete this taboo? This action will also remove the taboo from all routes that use it."]
+				}
+			}
 		}
-		function Routes:GetAceOptTabooTable()
-			return tabooTable
-		end
+		function Routes:GetAceOptTabooTable() return tabooTable end
 	end
 
 	local taboo_name = ""
@@ -2955,44 +2933,40 @@ do
 		desc = {
 			name = L["TABOO_DESC"],
 			type = "description",
-			order = 0,
+			order = 0
 		},
 		taboo_name = {
 			type = "input",
 			name = L["Name of Taboo"],
 			desc = L["Name of taboo region to add"],
 			validate = function(info, name)
-				if name == "" or strtrim(name) == "" then
-					return L["No name given for new taboo region"]
-				end
+				if name == "" or strtrim(name) == "" then return L["No name given for new taboo region"] end
 				return true
 			end,
 			get = function() return taboo_name end,
 			set = function(info, v) taboo_name = strtrim(v) end,
-			order = 100,
+			order = 100
 		},
 		zone_choice = {
-			name = L["Select Zone"], type = "select",
+			name = L["Select Zone"],
+			type = "select",
 			desc = L["Zone to create taboo in"],
 			order = 200,
 			values = function()
-				if not next(create_zones) then
-					for k, v in pairs(Routes.zoneNames) do
-						create_zones[v] = v
-					end
-				end
+				if not next(create_zones) then for k, v in pairs(Routes.zoneNames) do create_zones[v] = v end end
 				return create_zones
 			end,
 			get = function()
 				-- Use currently viewed map on first view.
-				create_zone = create_zone or Routes.zoneNames[GetCurrentMapContinent()*100 + GetCurrentMapZone()]
+				create_zone = create_zone or Routes.zoneNames[GetCurrentMapContinent() * 100 + GetCurrentMapZone()]
 				return create_zone
 			end,
 			set = function(info, key) create_zone = key end,
-			style = "radio",
+			style = "radio"
 		},
 		add_taboo = {
-			name = L["Create Taboo"], type = "execute",
+			name = L["Create Taboo"],
+			type = "execute",
 			desc = L["Create Taboo"],
 			order = 300,
 			func = function()
@@ -3015,8 +2989,8 @@ do
 						name = create_zone,
 						desc = L["Taboos in %s"]:format(create_zone),
 						args = {
-							desc = taboo_zone_args_desc_table,
-						},
+							desc = taboo_zone_args_desc_table
+						}
 					}
 					Routes.tabookeys[mapfile] = {}
 				end
@@ -3028,31 +3002,23 @@ do
 				taboo_name = ""
 				create_zone = nil
 			end,
-			disabled = function()
-				return not taboo_name or strtrim(taboo_name) == ""
-			end,
+			disabled = function() return not taboo_name or strtrim(taboo_name) == "" end,
 			confirm = function()
-				if #db.taboo[ Routes.zoneData[create_zone][4] ][taboo_name].route > 0 then
-					return true
-				end
+				if #db.taboo[Routes.zoneData[create_zone][4]][taboo_name].route > 0 then return true end
 				return false
 			end,
-			confirmText = L["A taboo with that name already exists. Overwrite?"],
-		},
+			confirmText = L["A taboo with that name already exists. Overwrite?"]
+		}
 	}
 
 	function TabooHandler:IsNotEditAllowed(info)
 		local zone = info[2]
-		local route = Routes.routekeys[zone][ info[3] ]
+		local route = Routes.routekeys[zone][info[3]]
 		local route_table = db.routes[zone][route]
 		if taboo_edit_list[route_table] then return true end
 		local is_running, route_table2 = Routes.TSP:IsTSPRunning()
-		if is_running and route_table2 == route_table.route then
-			return true
-		end
-		if ConfigHandler:IsCluster(info) then
-			return true
-		end
+		if is_running and route_table2 == route_table.route then return true end
+		if ConfigHandler:IsCluster(info) then return true end
 		return false
 	end
 
@@ -3066,7 +3032,7 @@ do
 				desc = {
 					type = "description",
 					order = 0,
-					name = L["ROUTE_EDIT_DESC"],
+					name = L["ROUTE_EDIT_DESC"]
 				},
 				edit_route = {
 					type = "execute",
@@ -3074,7 +3040,7 @@ do
 					desc = L["Edit this route on the world map"],
 					order = 1,
 					func = "EditTaboo",
-					disabled = "IsNotEditAllowed",
+					disabled = "IsNotEditAllowed"
 				},
 				save_edit_route = {
 					type = "execute",
@@ -3082,7 +3048,7 @@ do
 					desc = L["Stop editing this route on the world map and save the edits"],
 					order = 2,
 					func = "SaveEditTaboo",
-					disabled = "IsNotBeingEdited",
+					disabled = "IsNotBeingEdited"
 				},
 				cancel_edit_route = {
 					type = "execute",
@@ -3090,17 +3056,15 @@ do
 					desc = L["Stop editing this route on the world map and abandon changes made"],
 					order = 3,
 					func = "CancelEditTaboo",
-					disabled = "IsNotBeingEdited",
-				},
-			},
+					disabled = "IsNotBeingEdited"
+				}
+			}
 		}
-		function Routes:GetAceOptRouteEditTable()
-			return routeEditTable
-		end
+		function Routes:GetAceOptRouteEditTable() return routeEditTable end
 	end
 
-	--/run Routes:TestFunc()
-	--/run Routes:ClearTestFunc()
+	-- /run Routes:TestFunc()
+	-- /run Routes:ClearTestFunc()
 	--[[function Routes:TestFunc(taboo)
 		taboo = taboo or Routes.db.global.taboo[ Routes.zoneData["Shattrath City"][4] ]["abc"]
 		local fw, fh = RoutesTabooFrame:GetWidth(), RoutesTabooFrame:GetHeight()
@@ -3134,7 +3098,6 @@ do
 	end]]
 end
 
-
 do
 	-- This function tests if the node at location (x,y) is in a taboo region
 	-- It does this by drawing a line from (0,0) to (x,y) and seeing how many times
@@ -3145,24 +3108,22 @@ do
 		if x <= 0 or y <= 0 or x >= 1 or y >= 1 then return false end
 		local count = 0
 
-		local last_point = taboo.route[ #taboo.route ]
+		local last_point = taboo.route[#taboo.route]
 		local sx, sy = floor(last_point / 10000) / 10000, (last_point % 10000) / 10000
 		for i = 1, #taboo.route do
 			local point = taboo.route[i]
 			local ex, ey = floor(point / 10000) / 10000, (point % 10000) / 10000
 			-- check if (0,0)-(x,y) intersects with (sx,sy)-(ex,ey)
-			if sx >= 0 and sx <= x and sx/sy == x/y then -- check for endpoint 1
+			if sx >= 0 and sx <= x and sx / sy == x / y then -- check for endpoint 1
 				count = count + 1 -- (sx,sy) lies on the line
-			elseif ex >= 0 and ex <= x and ex/ey == x/y then -- check for endpoint 2
+			elseif ex >= 0 and ex <= x and ex / ey == x / y then -- check for endpoint 2
 				-- (ex,ey) lies on the line, do nothing
 			else
-				local d = (x*ey - x*sy - y*ex + y*sx)
+				local d = (x * ey - x * sy - y * ex + y * sx)
 				if d ~= 0 then
-					local u = (sx*y - sy*x)/d
-					local t = (sx + (ex-sx)*u)/x
-					if t >= 0 and t <= 1 and u >= 0 and u <= 1 then
-						count = count + 1
-					end
+					local u = (sx * y - sy * x) / d
+					local t = (sx + (ex - sx) * u) / x
+					if t >= 0 and t <= 1 and u >= 0 and u <= 1 then count = count + 1 end
 				end
 			end
 			sx, sy = ex, ey
@@ -3184,7 +3145,7 @@ do
 						local num_data = #route_data.metadata[i]
 						if num_data > 1 then
 							-- more than 1 node in this cluster
-							cx, cy = (cx * num_data - x) / (num_data-1), (cy * num_data - y) / (num_data-1)
+							cx, cy = (cx * num_data - x) / (num_data - 1), (cy * num_data - y) / (num_data - 1)
 							tremove(route_data.metadata[i], j)
 							route_data.route[i] = Routes:getID(cx, cy)
 						else
@@ -3217,11 +3178,7 @@ do
 			local coord = route_data.taboolist[i]
 			local x, y = Routes:getXY(coord)
 			local flag = false
-			for tabooname, used in pairs(route_data.taboos) do
-				if used and Routes:IsNodeInTaboo(x, y, db.taboo[zone][tabooname]) then
-					flag = true
-				end
-			end
+			for tabooname, used in pairs(route_data.taboos) do if used and Routes:IsNodeInTaboo(x, y, db.taboo[zone][tabooname]) then flag = true end end
 			if flag == false then
 				route_data.length = Routes.TSP:InsertNode(route_data.route, route_data.metadata, Routes.zoneMapFile[zone], coord, route_data.cluster_dist or 65) -- 65 is the old default
 				tremove(route_data.taboolist, i)
@@ -3231,12 +3188,11 @@ do
 	end
 end
 
-
 ------------------------------------------------------------------------------------------------------
 -- The following function is used with permission from Daniel Stephens <iriel@vigilance-committee.org>
 -- with reference to TaxiFrame.lua in Blizzard's UI and Graph-1.0 Ace2 library (by Cryect) which I now
 -- maintain after porting it to LibGraph-2.0 LibStub library -- Xinhuan
-local TAXIROUTE_LINEFACTOR = 128/126; -- Multiplying factor for texture coordinates
+local TAXIROUTE_LINEFACTOR = 128 / 126; -- Multiplying factor for texture coordinates
 local TAXIROUTE_LINEFACTOR_2 = TAXIROUTE_LINEFACTOR / 2; -- Half of that
 
 -- T        - Texture
@@ -3249,20 +3205,20 @@ function G:DrawLine(C, sx, sy, ex, ey, w, color, layer)
 	local relPoint = "BOTTOMLEFT"
 
 	if not C.Routes_Lines then
-		C.Routes_Lines={}
-		C.Routes_Lines_Used={}
+		C.Routes_Lines = {}
+		C.Routes_Lines_Used = {}
 	end
 
 	local T = tremove(C.Routes_Lines) or C:CreateTexture(nil, "ARTWORK")
 	T:SetTexture("Interface\\AddOns\\Routes\\line")
-	tinsert(C.Routes_Lines_Used,T)
+	tinsert(C.Routes_Lines_Used, T)
 
 	T:SetDrawLayer(layer or "ARTWORK")
 
-	T:SetVertexColor(color[1],color[2],color[3],color[4]);
+	T:SetVertexColor(color[1], color[2], color[3], color[4]);
 
 	-- Determine dimensions and center point of line
-	local dx,dy = ex - sx, ey - sy;
+	local dx, dy = ex - sx, ey - sy;
 
 	-- Calculate actual length of line
 	local l = ((dx * dx) + (dy * dy)) ^ 0.5;
@@ -3270,21 +3226,19 @@ function G:DrawLine(C, sx, sy, ex, ey, w, color, layer)
 	-- Quick escape if it's zero length
 	if l == 0 then
 		T:ClearAllPoints();
-		T:SetTexCoord(0,0,0,0,0,0,0,0);
+		T:SetTexCoord(0, 0, 0, 0, 0, 0, 0, 0);
 		T:SetPoint("BOTTOMLEFT", C, relPoint, cx, cy);
-		T:SetPoint("TOPRIGHT",   C, relPoint, cx, cy);
+		T:SetPoint("TOPRIGHT", C, relPoint, cx, cy);
 		return T;
 	end
 
-	local cx,cy = (sx + ex) / 2, (sy + ey) / 2;
+	local cx, cy = (sx + ex) / 2, (sy + ey) / 2;
 
 	-- Normalize direction if necessary
-	if (dx < 0) then
-		dx,dy = -dx,-dy;
-	end
+	if (dx < 0) then dx, dy = -dx, -dy; end
 
 	-- Sin and Cosine of rotation, and combination (for later)
-	local s,c = -dy / l, dx / l;
+	local s, c = -dy / l, dx / l;
 	local sc = s * c;
 
 	-- Calculate bounding box size and texture coordinates
@@ -3306,14 +3260,46 @@ function G:DrawLine(C, sx, sy, ex, ey, w, color, layer)
 	-- Thanks Blizzard for adding (-)10000 as a hard-cap and throwing errors!
 	-- The cap was added in 3.1.0 and I think it was upped in 3.1.1
 	--  (way less chance to get the error)
-	if TLx > 10000 then TLx = 10000 elseif TLx < -10000 then TLx = -10000 end
-	if TLy > 10000 then TLy = 10000 elseif TLy < -10000 then TLy = -10000 end
-	if BLx > 10000 then BLx = 10000 elseif BLx < -10000 then BLx = -10000 end
-	if BLy > 10000 then BLy = 10000 elseif BLy < -10000 then BLy = -10000 end
-	if TRx > 10000 then TRx = 10000 elseif TRx < -10000 then TRx = -10000 end
-	if TRy > 10000 then TRy = 10000 elseif TRy < -10000 then TRy = -10000 end
-	if BRx > 10000 then BRx = 10000 elseif BRx < -10000 then BRx = -10000 end
-	if BRy > 10000 then BRy = 10000 elseif BRy < -10000 then BRy = -10000 end
+	if TLx > 10000 then
+		TLx = 10000
+	elseif TLx < -10000 then
+		TLx = -10000
+	end
+	if TLy > 10000 then
+		TLy = 10000
+	elseif TLy < -10000 then
+		TLy = -10000
+	end
+	if BLx > 10000 then
+		BLx = 10000
+	elseif BLx < -10000 then
+		BLx = -10000
+	end
+	if BLy > 10000 then
+		BLy = 10000
+	elseif BLy < -10000 then
+		BLy = -10000
+	end
+	if TRx > 10000 then
+		TRx = 10000
+	elseif TRx < -10000 then
+		TRx = -10000
+	end
+	if TRy > 10000 then
+		TRy = 10000
+	elseif TRy < -10000 then
+		TRy = -10000
+	end
+	if BRx > 10000 then
+		BRx = 10000
+	elseif BRx < -10000 then
+		BRx = -10000
+	end
+	if BRy > 10000 then
+		BRy = 10000
+	elseif BRy < -10000 then
+		BRy = -10000
+	end
 
 	-- Set texture coordinates and anchors
 	T:ClearAllPoints();
@@ -3326,9 +3312,9 @@ function G:DrawLine(C, sx, sy, ex, ey, w, color, layer)
 		));
 	end
 	--]]
-	T:SetTexCoord( TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy )
+	T:SetTexCoord(TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy)
 	T:SetPoint("BOTTOMLEFT", C, relPoint, cx - Bwid, cy - Bhgt);
-	T:SetPoint("TOPRIGHT",   C, relPoint, cx + Bwid, cy + Bhgt);
+	T:SetPoint("TOPRIGHT", C, relPoint, cx + Bwid, cy + Bhgt);
 	T:Show()
 	return T
 end
@@ -3337,11 +3323,10 @@ function G:HideLines(C)
 	if C.Routes_Lines then
 		for i = #C.Routes_Lines_Used, 1, -1 do
 			C.Routes_Lines_Used[i]:Hide()
-			tinsert(C.Routes_Lines,tremove(C.Routes_Lines_Used))
+			tinsert(C.Routes_Lines, tremove(C.Routes_Lines_Used))
 		end
 	end
 end
-
 
 function Routes:ReparentMinimap(minimap)
 	self.G:HideLines(Minimap)
