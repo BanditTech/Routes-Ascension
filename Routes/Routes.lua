@@ -1,11 +1,12 @@
 ﻿--[[
 ********************************************************************************
 Routes
-v1.3.0
-18 October 2010
-(Written for Live Servers v4.0.1.13164)
+v1.3.2
+31 October 2025
+(Written for Ascension Servers v3.3.5a)
 
 Author: Xaroz @ EU Emerald Dream Alliance & Xinhuan @ US Blackrock Alliance
+Modifications: Xan & BanditTech
 ********************************************************************************
 
 Description:
@@ -39,25 +40,9 @@ Features:
 	- Works with Chinchilla's Expander minimap and SexyMap's HudMap!
 	- Full in-game help file and FAQ, guiding you step by step on what to do! 
 
-Download:
-	The latest version of Routes is always available on
-	- http://www.wowace.com/projects/routes/
-	- http://wow.curse.com/downloads/wow-addons/details/routes.aspx
-	- http://www.wowinterface.com/downloads/info11401-Routes.html
-
-Localization:
-	You can contribute by updating/adding localizations using the system on
-	- http://www.wowace.com/projects/routes/localization/
-
-Contact:
-	If you find any bugs or have any suggestions, you can contact us on:
-
-	Forum: http://forums.wowace.com/showthread.php?t=10369
-	IRC  : Grum or Xinhuan on irc://irc.freenode.org/wowace
-	Email: Grum ( routes AT grum DOT nl )
-	       Xinhuan ( xinhuan AT gmail DOT com )
-	       Paypal donations are welcome ;)
-]] Routes = LibStub("AceAddon-3.0"):NewAddon("Routes", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
+********************************************************************************
+]] --
+Routes = LibStub("AceAddon-3.0"):NewAddon("Routes", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 local Routes = Routes
 local L = LibStub("AceLocale-3.0"):GetLocale("Routes", false)
 local G = {} -- was Graph-1.0, but we removed the dependency
@@ -635,10 +620,10 @@ function Routes:DrawMinimapLines(forceUpdate)
 							local d2y = draw_ey - cy
 
 							-- Swapped axes shenanigans
-							draw_sx = minimap_center_x + (-d1y) * scale_y
-							draw_sy = minimap_center_y + (d1x) * scale_x
-							draw_ex = minimap_center_x + (-d2y) * scale_y
-							draw_ey = minimap_center_y + (d2x) * scale_x
+							draw_sx = minimap_center_x - d1y * scale_y
+							draw_sy = minimap_center_y + d1x * scale_x
+							draw_ex = minimap_center_x - d2y * scale_y
+							draw_ey = minimap_center_y + d2x * scale_x
 
 							if defaults.line_gaps then
 								-- shorten the line by 5 pixels (scaled) on endpoints inside the Minimap
