@@ -414,8 +414,9 @@ function Routes:DrawMinimapLines(forceUpdate)
 					if minimap_rotate then
 						local dx = last_x - cx
 						local dy = last_y - cy
-						last_x = cx + dx * cos - dy * sin
-						last_y = cy + dx * sin + dy * cos
+						-- Apply clockwise rotation to match minimap rotation direction
+						last_x = cx + dx * cos + dy * sin
+						last_y = cy - dx * sin + dy * cos
 					end
 					last_inside = is_inside(last_x, last_y, cx, cy, radius)
 				end
@@ -436,8 +437,9 @@ function Routes:DrawMinimapLines(forceUpdate)
 						if minimap_rotate then
 							local dx = cur_x - cx
 							local dy = cur_y - cy
-							cur_x = cx + dx * cos - dy * sin
-							cur_y = cy + dx * sin + dy * cos
+							-- Apply clockwise rotation to match minimap rotation direction
+							cur_x = cx + dx * cos + dy * sin
+							cur_y = cy - dx * sin + dy * cos
 						end
 						cur_inside = is_inside(cur_x, cur_y, cx, cy, radius)
 					end
@@ -626,25 +628,17 @@ function Routes:DrawMinimapLines(forceUpdate)
 						end
 
 						if draw_sx and draw_sy and draw_ex and draw_ey then
-							-- Transform to minimap pixels using Astrolabe's axis mapping:
-							-- rotateMinimap ON:  (x, y) -> ( dx*scale_x,  dy*scale_y )
-							-- rotateMinimap OFF: (x, y) -> (-dy*scale_y, dx*scale_x)
+							-- Transform to minimap pixels
 							local d1x = draw_sx - cx
 							local d1y = draw_sy - cy
 							local d2x = draw_ex - cx
 							local d2y = draw_ey - cy
 
-							if minimap_rotate then
-								draw_sx = minimap_center_x + d1x * scale_x
-								draw_sy = minimap_center_y + d1y * scale_y
-								draw_ex = minimap_center_x + d2x * scale_x
-								draw_ey = minimap_center_y + d2y * scale_y
-							else
-								draw_sx = minimap_center_x + (-d1y) * scale_y
-								draw_sy = minimap_center_y + (d1x) * scale_x
-								draw_ex = minimap_center_x + (-d2y) * scale_y
-								draw_ey = minimap_center_y + (d2x) * scale_x
-							end
+							-- Swapped axes shenanigans
+							draw_sx = minimap_center_x + (-d1y) * scale_y
+							draw_sy = minimap_center_y + (d1x) * scale_x
+							draw_ex = minimap_center_x + (-d2y) * scale_y
+							draw_ey = minimap_center_y + (d2x) * scale_x
 
 							if defaults.line_gaps then
 								-- shorten the line by 5 pixels (scaled) on endpoints inside the Minimap

@@ -1,8 +1,11 @@
-tag v1.3.1
-fc9f0fa55c3e0b14b9913cc56b43d62770f30930
-Xinhuan <xinhuan@pacific.net.sg>
-2010-10-18 06:49:16 +0800
+tag v1.3.2
+2025-10-31
+--------------------
+BanditTech:
+	- Fixed minimap rotation support.
 
+tag v1.3.1
+2025-10-30
 --------------------
 BanditTech:
 	- Modified to support Ascension wow client.
@@ -12,6 +15,10 @@ BanditTech:
 	- Changed formula for drawing points to properly use Minimap:GetViewRadius() output.
 Xan:
 	- Implemented Minimap:GetViewRadius() usage.
+
+tag v1.3.0
+2010-10-18
+--------------------
 Xinhuan:
 	- Add support for GatherMate2.
 	- Update Interface to 40000, add GatherMate2 as optionaldeps.
