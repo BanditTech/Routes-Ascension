@@ -283,30 +283,6 @@ end
 
 local last_X, last_Y, last_facing = 1 / 0, 1 / 0, 1 / 0
 
--- implementation of cache - use zone in the key for an unique identifier
--- because every zone has a different X/Y location and possible yardsizes
-local X_cache = {}
-local Y_cache = {}
-local XY_cache_mt = {
-	__index = function(t, key)
-		local zone, coord = (';'):split(key)
-		local X = Routes.zoneData[zone][1] * floor(coord / 10000) / 10000
-		local Y = Routes.zoneData[zone][2] * (coord % 10000) / 10000
-		X_cache[key] = X
-		Y_cache[key] = Y
-
-		-- figure out which one to return
-		if t == X_cache then
-			return X
-		else
-			return Y
-		end
-	end
-}
-
-setmetatable(X_cache, XY_cache_mt)
-setmetatable(Y_cache, XY_cache_mt)
-
 -- World-coordinate caches (in game world yards) keyed by "areaID;coord"
 local WX_cache = {}
 local WY_cache = {}
@@ -1594,6 +1570,7 @@ function ConfigHandler.GetRouteClusterRadiusDesc(info)
 	end
 end
 
+-- Descriptions
 do
 	local str = {}
 	function ConfigHandler.GetDataDesc(info)
