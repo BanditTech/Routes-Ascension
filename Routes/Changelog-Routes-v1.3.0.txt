@@ -1,10 +1,7 @@
-tag v1.3.0
+tag v1.3.1
 fc9f0fa55c3e0b14b9913cc56b43d62770f30930
 Xinhuan <xinhuan@pacific.net.sg>
 2010-10-18 06:49:16 +0800
-
-Tagging v1.3.0 for release. If anything is bugged, it won't be fixed until after Blizzcon.
-
 
 --------------------
 BanditTech:
